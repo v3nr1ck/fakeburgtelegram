@@ -1,0 +1,84 @@
+name: "Fake Burg Telegram"
+tagline: "Informing Mechanicsburg & Champaign County — mostly"
+domain: "fakeburgtelegram.com"
+location: "Mechanicsburg, Ohio"
+county: "Champaign County"
+phone: "(937) 555-0183"
+address: "1 Telegram Square, Mechanicsburg, OH 43044"
+email_news: "news@fakeburgtelegram.com"
+email_sports: "sports@fakeburgtelegram.com"
+email_class: "classifieds@fakeburgtelegram.com"
+copyright_year: 2026
+parody_notice: "This is a satirical / parody publication. Not a real newspaper. Names, events, and quotes are fabricated for entertainment."
+
+nav:
+  - label: News
+    children:
+      - { label: Latest News, href: /category/news/ }
+      - { label: Top Stories, href: /category/top-stories/ }
+      - { label: Special Sections, href: /category/special-sections/ }
+      - { label: Submit News Tip, href: /submit-news-tip/ }
+  - label: Fair
+    href: /category/fair/
+  - label: Sports
+    children:
+      - { label: Latest Sports, href: /category/sports/ }
+      - { label: Submit Scores, href: /submit-scores/ }
+  - label: Obituaries
+    children:
+      - { label: Latest Obituaries, href: /category/obituaries/ }
+      - { label: Submit an Obituary, href: /submit-an-obituary/ }
+  - label: Opinion
+    children:
+      - { label: Latest Opinion, href: /category/opinion/ }
+      - { label: Letter to the Editor, href: /letter-to-the-editor/ }
+      - { label: Submit Guest Column, href: /submit-guest-column/ }
+  - label: Life & Community
+    children:
+      - { label: Lifestyle, href: /category/lifestyle/ }
+      - { label: Community, href: /category/community/ }
+      - { label: Submit Anniversary, href: /submit-anniversary/ }
+      - { label: Submit Birth, href: /submit-birth/ }
+      - { label: Submit Engagement, href: /submit-engagement/ }
+      - { label: Submit Wedding, href: /submit-wedding/ }
+  - label: Classifieds
+    href: /classifieds/
+  - label: Connect with Us
+    children:
+      - { label: About Us, href: /about/ }
+      - { label: Contact Us, href: /contact/ }
+      - { label: Privacy Policy, href: /privacy-policy/ }
+
+home_sections:
+  - { title: Top Stories, category: top-stories, layout: hero, limit: 5 }
+  - { title: News, category: news, layout: featured-list, limit: 8 }
+  - { title: Sports, category: sports, layout: featured-list, limit: 8 }
+  - { title: Life & Culture, category: community, layout: featured-list, limit: 8 }
+  - { title: Opinion, category: opinion, layout: featured-list, limit: 8 }
+  - { title: Special Sections, category: special-sections, layout: grid, limit: 6 }
+
+categories:
+  top-stories: { name: Top Stories, description: The biggest stories in Champaign County. }
+  news: { name: News, description: Local news from Mechanicsburg and Champaign County. }
+  sports: { name: Sports, description: High school, rec leagues, and regional sports. }
+  opinion: { name: Opinion, description: Editorials, columns, and letters. }
+  community: { name: Life & Culture, description: Community life around Fake Burg. }
+  lifestyle: { name: Lifestyle, description: Living, dining, and local culture. }
+  special-sections: { name: Special Sections, description: Features and special coverage. }
+  fair: { name: Fair, description: Champaign County Fair and related coverage. }
+  obituaries: { name: Obituaries, description: Remembrances and notices. }
+
+weather:
+  city: Mechanicsburg
+  condition: Partly cloudy
+  temp_f: 78
+  high: 84
+  low: 64
+  humidity: 62
+  wind_mph: 7
+  forecast:
+    - { day: Thu, high: 86 }
+    - { day: Fri, high: 82 }
+    - { day: Sat, high: 79 }
+    - { day: Sun, high: 81 }
+    - { day: Mon, high: 77 }

@@ -1,0 +1,16 @@
+# Local / OS
+.DS_Store
+Thumbs.db
+*.pyc
+__pycache__/
+.venv/
+venv/
+.env
+
+# Editor
+.idea/
+.vscode/
+*.swp
+
+# Built site is generated in CI — don't commit dist unless you prefer manual deploys
+dist/
