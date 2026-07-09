@@ -62,19 +62,29 @@ def slugify(s: str) -> str:
 
 
 def parse_frontmatter(text: str) -> tuple[dict, str]:
-    if text.startswith("---"):
-        parts = text.split("---", 2)
-        if len(parts) >= 3:
-            meta = {}
-            if yaml:
-                meta = yaml.safe_load(parts[1]) or {}
-            else:
-                for line in parts[1].splitlines():
-                    if ":" in line:
-                        k, v = line.split(":", 1)
-                        meta[k.strip()] = v.strip().strip('"').strip("'")
+    if not text.startswith("---"):
+        return {}, text
+    parts = text.split("---", 2)
+    if len(parts) < 3:
+        return {}, text
+    meta: dict = {}
+    if yaml:
+        try:
+            meta = yaml.safe_load(parts[1]) or {}
             return meta, parts[2].lstrip("\n")
-    return {}, text
+        except Exception:
+            meta = {}
+    for line in parts[1].splitlines():
+        if ":" not in line or line.strip().startswith("#"):
+            continue
+        k, v = line.split(":", 1)
+        k = k.strip()
+        v = v.strip().strip('"').strip("'")
+        if v.lower() in ("true", "false"):
+            meta[k] = v.lower() == "true"
+        else:
+            meta[k] = v
+    return meta, parts[2].lstrip("\n")
 
 
 def dump_frontmatter(meta: dict) -> str:
@@ -83,6 +93,7 @@ def dump_frontmatter(meta: dict) -> str:
         "title",
         "slug",
         "date",
+        "publish_date",
         "category",
         "author",
         "excerpt",
@@ -90,6 +101,7 @@ def dump_frontmatter(meta: dict) -> str:
         "image_caption",
         "top_story",
         "featured",
+        "draft",
     ]
     seen = set()
     for key in order:
@@ -110,9 +122,18 @@ def dump_frontmatter(meta: dict) -> str:
     return "\n".join(lines) + "\n"
 
 
+def truthy(val) -> bool:
+    if isinstance(val, bool):
+        return val
+    if val is None:
+        return False
+    return str(val).strip().lower() in ("1", "true", "yes", "on")
+
+
 def list_articles() -> list[dict]:
     ARTICLES.mkdir(parents=True, exist_ok=True)
     items = []
+    today = date.today().isoformat()
     for path in ARTICLES.glob("*.md"):
         meta, body = parse_frontmatter(path.read_text(encoding="utf-8"))
         cats = meta.get("category") or meta.get("categories") or ""
@@ -123,12 +144,18 @@ def list_articles() -> list[dict]:
         has_photo = False
         if image.startswith("/"):
             has_photo = (ROOT / image.lstrip("/")).is_file()
+        byline = str(meta.get("date") or "")[:10]
+        pub = str(meta.get("publish_date") or meta.get("date") or "")[:10]
+        is_draft = truthy(meta.get("draft"))
+        scheduled = (not is_draft) and pub > today
+        live = (not is_draft) and pub <= today
         items.append(
             {
                 "filename": path.name,
                 "title": meta.get("title") or path.stem,
                 "slug": meta.get("slug") or path.stem,
-                "date": str(meta.get("date") or "")[:10],
+                "date": byline,
+                "publish_date": pub,
                 "category": cats,
                 "author": meta.get("author") or "",
                 "excerpt": meta.get("excerpt") or "",
@@ -136,6 +163,9 @@ def list_articles() -> list[dict]:
                 "has_photo": has_photo,
                 "top_story": bool(meta.get("top_story")),
                 "featured": bool(meta.get("featured")),
+                "draft": is_draft,
+                "scheduled": scheduled,
+                "live": live,
                 "body": body,
                 "meta": meta,
             }
@@ -143,7 +173,7 @@ def list_articles() -> list[dict]:
 
     def sort_key(a):
         try:
-            return datetime.strptime(a["date"], "%Y-%m-%d")
+            return datetime.strptime(a["publish_date"] or a["date"], "%Y-%m-%d")
         except Exception:
             return datetime.min
 
@@ -178,6 +208,7 @@ def write_article(
     title: str,
     slug: str,
     date_str: str,
+    publish_date: str,
     categories: list[str],
     author: str,
     excerpt: str,
@@ -186,11 +217,13 @@ def write_article(
     image_caption: str,
     top_story: bool,
     featured: bool,
+    draft: bool = False,
     old_filename: str | None = None,
 ) -> Path:
     ARTICLES.mkdir(parents=True, exist_ok=True)
     slug = slugify(slug or title)
     date_str = date_str or date.today().isoformat()
+    publish_date = (publish_date or date_str).strip()[:10]
     cat_str = ", ".join(categories) if categories else "news"
     if top_story and "top-stories" not in [c.strip() for c in cat_str.split(",")]:
         cat_str = f"{cat_str}, top-stories"
@@ -199,17 +232,21 @@ def write_article(
         "title": title.strip(),
         "slug": slug,
         "date": date_str,
+        "publish_date": publish_date,
         "category": cat_str,
         "author": (author or "Staff report").strip(),
         "excerpt": excerpt.strip(),
         "top_story": top_story,
         "featured": featured,
     }
+    if draft:
+        meta["draft"] = True
     if image:
         meta["image"] = image
     if image_caption:
         meta["image_caption"] = image_caption.strip()
 
+    # Filename uses byline date + slug (stable); go-live is publish_date in frontmatter
     new_name = f"{date_str}-{slug}.md"
     new_path = ARTICLES / new_name
     new_path.write_text(dump_frontmatter(meta) + "\n" + body.strip() + "\n", encoding="utf-8")
@@ -284,6 +321,9 @@ BASE = r"""
     .badge.hero { background: #bee3f8; color: #2a4365; }
     .badge.photo { background: #c6f6d5; color: #22543d; }
     .badge.nophoto { background: #feebc8; color: #7b341e; }
+    .badge.live { background: #c6f6d5; color: #22543d; }
+    .badge.scheduled { background: #e9d8fd; color: #553c9a; }
+    .badge.draft { background: #e2e8f0; color: #4a5568; }
     form.edit label { display: block; font-weight: 700; font-size: 13px; margin: 1rem 0 0.35rem; }
     form.edit input[type=text], form.edit input[type=date], form.edit input[type=file],
     form.edit textarea, form.edit select {
@@ -334,16 +374,16 @@ DASHBOARD = """
 {% block title %}Articles{% endblock %}
 {% block body %}
   <h1>Articles</h1>
-  <p class="sub">{{ articles|length }} stories · edit photos &amp; copy here, then Publish for the live site.</p>
+  <p class="sub">{{ articles|length }} stories · set <strong>Publish date</strong> to schedule · CMS push keeps those dates.</p>
   <div class="toolbar">
     <a class="btn" href="{{ url_for('new_article') }}">+ New article</a>
     <a class="btn ok" href="{{ url_for('publish_site') }}">Publish to site</a>
-    <span class="muted">Orange badge = still using a gradient (no photo).</span>
+    <span class="muted">Purple = scheduled (not live yet). Orange = needs photo.</span>
   </div>
   <div class="card">
     <table>
       <thead>
-        <tr><th>Photo</th><th>Story</th><th>Section</th><th></th></tr>
+        <tr><th>Photo</th><th>Story</th><th>Go live</th><th>Section</th><th></th></tr>
       </thead>
       <tbody>
         {% for a in articles %}
@@ -355,17 +395,21 @@ DASHBOARD = """
           </td>
           <td>
             <strong>{{ a.title }}</strong><br>
-            <span class="muted">{{ a.date }} · {{ a.author }}</span>
+            <span class="muted">byline {{ a.date }} · {{ a.author }}</span>
+            {% if a.draft %}<span class="badge draft">draft</span>
+            {% elif a.scheduled %}<span class="badge scheduled">scheduled</span>
+            {% elif a.live %}<span class="badge live">live</span>{% endif %}
             {% if a.top_story %}<span class="badge hero">homepage hero</span>{% endif %}
             {% if a.has_photo %}<span class="badge photo">has photo</span>{% else %}<span class="badge nophoto">needs photo</span>{% endif %}
           </td>
+          <td><span class="muted">{{ a.publish_date }}</span></td>
           <td><span class="muted">{{ a.category }}</span></td>
           <td style="white-space:nowrap">
             <a class="btn ghost" href="{{ url_for('edit_article', filename=a.filename) }}">Edit</a>
           </td>
         </tr>
         {% else %}
-        <tr><td colspan="4" class="muted">No articles yet.</td></tr>
+        <tr><td colspan="5" class="muted">No articles yet.</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -388,12 +432,30 @@ EDIT = """
 
     <div class="row">
       <div>
-        <label>Date</label>
+        <label>Byline date</label>
         <input type="date" name="date" value="{{ article.date if article and article.date else today }}">
+        <p class="help">Date shown under the headline.</p>
       </div>
+      <div>
+        <label>Publish date (go live)</label>
+        <input type="date" name="publish_date" value="{{ article.publish_date if article and article.publish_date else (article.date if article and article.date else today) }}">
+        <p class="help">Site only shows the story on/after this day (Eastern). Future = scheduled.</p>
+      </div>
+    </div>
+
+    <div class="row">
       <div>
         <label>Author / byline</label>
         <input type="text" name="author" value="{{ article.author if article else 'Staff report' }}">
+      </div>
+      <div>
+        <label style="margin-top:1.6rem">&nbsp;</label>
+        <div class="checks" style="margin-top:0.35rem">
+          <label>
+            <input type="checkbox" name="draft" value="1" {% if article and article.draft %}checked{% endif %}>
+            Draft (never auto-publish)
+          </label>
+        </div>
       </div>
     </div>
 
@@ -561,7 +623,8 @@ def _save_from_form(old_filename: str | None):
         return redirect(request.url)
 
     slug = (request.form.get("slug") or "").strip() or slugify(title)
-    date_str = (request.form.get("date") or date.today().isoformat()).strip()
+    date_str = (request.form.get("date") or date.today().isoformat()).strip()[:10]
+    publish_date = (request.form.get("publish_date") or date_str).strip()[:10]
     author = request.form.get("author") or "Staff report"
     excerpt = request.form.get("excerpt") or ""
     body = request.form.get("body") or ""
@@ -569,6 +632,7 @@ def _save_from_form(old_filename: str | None):
     categories = request.form.getlist("category")
     top_story = request.form.get("top_story") == "1"
     featured = request.form.get("featured") == "1"
+    draft = request.form.get("draft") == "1"
     remove_image = request.form.get("remove_image") == "1"
 
     image = ""
@@ -591,6 +655,7 @@ def _save_from_form(old_filename: str | None):
         title=title,
         slug=slug,
         date_str=date_str,
+        publish_date=publish_date,
         categories=categories,
         author=author,
         excerpt=excerpt,
@@ -599,6 +664,7 @@ def _save_from_form(old_filename: str | None):
         image_caption=image_caption,
         top_story=top_story,
         featured=featured,
+        draft=draft,
         old_filename=old_filename,
     )
 
