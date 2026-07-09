@@ -9,7 +9,7 @@ top_story: false
 featured: true
 ---
 
-**MECHANICSBURG** — A Facebook event for a multi-year **Indians** alumni reunion has devolved into debates about open bar vs. cash bar, whether the DJ can play country, and who “actually peopled” in 11th grade on **High Street**.
+MECHANICSBURG — A Facebook event for a multi-year Indians alumni reunion has devolved into debates about open bar vs. cash bar, whether the DJ can play country, and who “actually peopled” in 11th grade on High Street.
 
 “I just wanted a taco bar,” said the organizer, who has muted her own event.
 

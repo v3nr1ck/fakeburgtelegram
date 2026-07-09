@@ -11,11 +11,11 @@ featured: true
 
 To the editor:
 
-To the people who leave their cars running in the fire lane / no-park zone energy near **St. Paris Shoppers** on **W. Main Street** “just for a sec”: the sec is never a sec, and the rest of us can see you from Springfield Street.
+To the people who leave their cars running in the fire lane / no-park zone energy near St. Paris Shoppers on W. Main Street “just for a sec”: the sec is never a sec, and the rest of us can see you from Springfield Street.
 
 You are not slick. You are not busy in a special way. You are blocking the kind of emergency that would be very funny if it happened to you and very sad if it happened to me.
 
-Park in a space. Walk the 11 extra steps past the **Sunoco**. Grow.
+Park in a space. Walk the 11 extra steps past the Sunoco. Grow.
 
 Sincerely,  
 Someone with a cart and a dream

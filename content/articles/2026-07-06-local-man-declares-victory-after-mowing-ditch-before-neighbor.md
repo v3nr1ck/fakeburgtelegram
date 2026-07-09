@@ -10,10 +10,10 @@ top_story: true
 featured: false
 ---
 
-**MECHANICSBURG** — In what neighbors described as a “quiet flex,” Todd Brenneman finished mowing his road ditch at 7:14 a.m. Saturday — a full 11 minutes before the guy across the township road even opened his garage.
+MECHANICSBURG — In what neighbors described as a “quiet flex,” Todd Brenneman finished mowing his road ditch at 7:14 a.m. Saturday — a full 11 minutes before the guy across the township road even opened his garage.
 
 “He can keep his zero-turn,” Brenneman said, wiping dew off a 2009 John Deere. “I’ve got commitment.”
 
-The informal ditch race has no trophy, rules, or governing body, though both parties insist the other started it in 2019 somewhere off the **US-36** corridor.
+The informal ditch race has no trophy, rules, or governing body, though both parties insist the other started it in 2019 somewhere off the US-36 corridor.
 
-Brenneman’s wife, Kim, confirmed the victory breakfast was biscuits and gravy “with an unnecessary amount of pride,” possibly involving a later coffee stop on **Main Street**.
+Brenneman’s wife, Kim, confirmed the victory breakfast was biscuits and gravy “with an unnecessary amount of pride,” possibly involving a later coffee stop on Main Street.

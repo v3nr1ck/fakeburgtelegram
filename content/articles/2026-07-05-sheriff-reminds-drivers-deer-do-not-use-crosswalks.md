@@ -10,10 +10,10 @@ top_story: true
 featured: false
 ---
 
-**URBANA** — The Champaign County Sheriff’s Office issued a seasonal advisory Monday after a string of deer-related fender-benders on county roads and stretches of **US-36** and **US-68**, none of which, deputies noted, involved a deer that “signaled.”
+URBANA — The Champaign County Sheriff’s Office issued a seasonal advisory Monday after a string of deer-related fender-benders on county roads and stretches of US-36 and US-68, none of which, deputies noted, involved a deer that “signaled.”
 
-“If you see one, assume there’s a committee,” said a spokesperson. “They travel in groups and have no respect for the posted speed limit near the **fairgrounds on Park Avenue**.”
+“If you see one, assume there’s a committee,” said a spokesperson. “They travel in groups and have no respect for the posted speed limit near the fairgrounds on Park Avenue.”
 
-Drivers are urged to slow down at dusk, use high beams when safe, and stop telling Facebook the deer “came out of nowhere” when the nowhere was clearly a cornfield toward **Rosewood** or **Mutual**.
+Drivers are urged to slow down at dusk, use high beams when safe, and stop telling Facebook the deer “came out of nowhere” when the nowhere was clearly a cornfield toward Rosewood or Mutual.
 
 No tickets were issued to wildlife.

@@ -11,7 +11,7 @@ top_story: true
 featured: true
 ---
 
-**NORTH LEWISBURG, OH** — In what has been dubbed “the most controversial athletic hire in small-town Ohio history,” the Triad Local Schools board voted unanimously Monday to hire local townie William “Bill” Hickley as **Cardinals** baseball coach on the **Brush Lake Road** campus.
+NORTH LEWISBURG, OH — In what has been dubbed “the most controversial athletic hire in small-town Ohio history,” the Triad Local Schools board voted unanimously Monday to hire local townie William “Bill” Hickley as Cardinals baseball coach on the Brush Lake Road campus.
 
 Though many community members had argued that Hickley was unqualified for such a high-profile position due to his lack of coaching experience, others said his deep roots in the area made him the ideal choice to lead the struggling baseball team.
 
@@ -33,6 +33,6 @@ According to sources within Triad High School, Hickley has long been considered 
 
 Added a second source: “If you ask me, this whole controversy smacks of elitism. After all, what does Hickley’s plumbing-supply-store owner daddy have to do with anything? Just because he can’t fit a washer onto a thread or understand why a sink gets clogged up with grease doesn’t mean he should keep a young student-athlete from realizing his dream of playing college ball. Now, some of us may not know what kind of nut is on the end of a screwdriver, but we know what a knucklehead looks like when we see one, believe you me!”
 
-As of press time, reports indicated that more than half of the student body had signed a petition supporting the hiring of Hickley. In addition, the baseball-coach candidate received an unexpected endorsement Tuesday afternoon, when the entire girls’ basketball team showed up to cheer him on during a pick-up game of street hockey against some Triad boys in a parking lot off **Maple Street** near the village offices.
+As of press time, reports indicated that more than half of the student body had signed a petition supporting the hiring of Hickley. In addition, the baseball-coach candidate received an unexpected endorsement Tuesday afternoon, when the entire girls’ basketball team showed up to cheer him on during a pick-up game of street hockey against some Triad boys in a parking lot off Maple Street near the village offices.
 
 “The kids love him,” Triad High School senior and co-captain of the basketball team Jason Pollack said. “Everybody loves Hickley. He’s the best. He even buys us beer!”

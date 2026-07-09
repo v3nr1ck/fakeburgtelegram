@@ -9,8 +9,8 @@ top_story: false
 featured: true
 ---
 
-**URBANA** — Guests entering a local living room this month are immediately guided to a shadowbox containing a “Season Complete” plaque from a coed softball league that plays diamonds around town and does not keep standings anyone can agree on.
+URBANA — Guests entering a local living room this month are immediately guided to a shadowbox containing a “Season Complete” plaque from a coed softball league that plays diamonds around town and does not keep standings anyone can agree on.
 
-“We battled,” said the honoree, who batted .214 and once slid when there was no play at the base at a field near the **Gwynne Street** side of town.
+“We battled,” said the honoree, who batted .214 and once slid when there was no play at the base at a field near the Gwynne Street side of town.
 
-Her husband confirmed the plaque cost more to frame than a night at the **Gloria Theatre** plus popcorn, which he described as “an investment in morale.”
+Her husband confirmed the plaque cost more to frame than a night at the Gloria Theatre plus popcorn, which he described as “an investment in morale.”

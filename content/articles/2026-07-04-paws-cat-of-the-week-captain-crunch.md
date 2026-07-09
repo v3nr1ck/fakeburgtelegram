@@ -7,7 +7,7 @@ author: Staff report
 excerpt: Local shelter highlight — orange tabby seeks couch, treats, and limited vacuum exposure.
 ---
 
-**URBANA** — This week’s featured adoptable cat is Captain Crunch, an orange tabby who enjoys sunbeams, cardboard, and judging your life choices from the top of the fridge — preferably after you’ve driven past **Park Avenue** and pretended you weren’t going to stop at the fairgrounds flea market.
+URBANA — This week’s featured adoptable cat is Captain Crunch, an orange tabby who enjoys sunbeams, cardboard, and judging your life choices from the top of the fridge — preferably after you’ve driven past Park Avenue and pretended you weren’t going to stop at the fairgrounds flea market.
 
 Shelter staff say he is good with other cats if they understand his management style.
 

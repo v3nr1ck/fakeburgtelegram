@@ -9,8 +9,8 @@ top_story: false
 featured: true
 ---
 
-**MECHANICSBURG** — A Burg father surprised his household with a used boat purchase he framed as “for the kids” and “for **Indian Lake** weekends,” while the kids primarily wanted Wi‑Fi and not to wake up at 6 a.m. to put on life jackets.
+MECHANICSBURG — A Burg father surprised his household with a used boat purchase he framed as “for the kids” and “for Indian Lake weekends,” while the kids primarily wanted Wi‑Fi and not to wake up at 6 a.m. to put on life jackets.
 
-“Memories,” he said, standing in a driveway off a side street near **Main**, next to a hull that needs “a little work.”
+“Memories,” he said, standing in a driveway off a side street near Main, next to a hull that needs “a little work.”
 
-Mom estimated the true cost as the boat plus the truck that can pull the boat plus the arguments about the truck on **US-36**. She has begun pricing storage with the energy of someone planning an exit.
+Mom estimated the true cost as the boat plus the truck that can pull the boat plus the arguments about the truck on US-36. She has begun pricing storage with the energy of someone planning an exit.

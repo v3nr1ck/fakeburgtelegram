@@ -9,8 +9,8 @@ top_story: false
 featured: true
 ---
 
-**MECHANICSBURG** — Local grandparents were informed via Facebook that 16-year-old Logan Hess “starts his first job Monday” at **Frosty’s Pizza** on **N. Main Street**, accompanied by a photo of a polo shirt and language usually reserved for deployments.
+MECHANICSBURG — Local grandparents were informed via Facebook that 16-year-old Logan Hess “starts his first job Monday” at Frosty’s Pizza on N. Main Street, accompanied by a photo of a polo shirt and language usually reserved for deployments.
 
-“He’s learning the value of a dollar,” his father wrote, under a post that also asked if anyone had a hookup on free **Indians** tickets.
+“He’s learning the value of a dollar,” his father wrote, under a post that also asked if anyone had a hookup on free Indians tickets.
 
 Logan, reached for comment between orientation videos, said the job is “fine” and that his mom already told the dentist, the bank teller, and a woman she doesn’t like at church.

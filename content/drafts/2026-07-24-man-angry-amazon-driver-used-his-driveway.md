@@ -9,8 +9,8 @@ top_story: false
 featured: true
 ---
 
-**MUTUAL** — A homeowner spent Tuesday afternoon photographing tire impressions in his driveway after a delivery van successfully dropped off a package he ordered while “supporting local” online from a porch between Mutual and **Woodstock**.
+MUTUAL — A homeowner spent Tuesday afternoon photographing tire impressions in his driveway after a delivery van successfully dropped off a package he ordered while “supporting local” online from a porch between Mutual and Woodstock.
 
 “There’s a turnaround for a reason,” he said, pointing at a patch of grass that is not a turnaround.
 
-The package contained a “No Soliciting” sign and a new doormat that says “Be Nice Or Leave,” which the universe appeared to file under irony next to his **US-36** commute complaints.
+The package contained a “No Soliciting” sign and a new doormat that says “Be Nice Or Leave,” which the universe appeared to file under irony next to his US-36 commute complaints.

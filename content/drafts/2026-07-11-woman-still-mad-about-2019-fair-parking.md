@@ -11,9 +11,9 @@ featured: true
 
 To the editor:
 
-I am writing again about the parking at the **Champaign County Fair** in 2019 on **Park Avenue** in Urbana. Yes, 2019. Some things you don’t just “move on” from.
+I am writing again about the parking at the Champaign County Fair in 2019 on Park Avenue in Urbana. Yes, 2019. Some things you don’t just “move on” from.
 
-We were directed into a field that was 40 percent mud and 60 percent spite. My husband still brings it up every time we pass the fairgrounds on the way to **Crabill’s**.
+We were directed into a field that was 40 percent mud and 60 percent spite. My husband still brings it up every time we pass the fairgrounds on the way to Crabill’s.
 
 If fair organizers want my funnel-cake money this August, I expect either solid ground or a formal apology delivered over the loudspeaker between livestock shows.
 

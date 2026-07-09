@@ -9,8 +9,8 @@ top_story: false
 featured: true
 ---
 
-**CHAMPAIGN COUNTY** — A motorist who casually told his passenger “corn’s late this year” while driving **US-36** west toward Urbana was interrupted when another driver pulled alongside near a stop to disagree.
+CHAMPAIGN COUNTY — A motorist who casually told his passenger “corn’s late this year” while driving US-36 west toward Urbana was interrupted when another driver pulled alongside near a stop to disagree.
 
-“She’s knee-high by the Fourth if you’re measuring right,” said the correcting party, who declined to give his name but identified himself as “someone who farms off toward **Cable**.”
+“She’s knee-high by the Fourth if you’re measuring right,” said the correcting party, who declined to give his name but identified himself as “someone who farms off toward Cable.”
 
 The original motorist said he had not been measuring at all, merely making noise to fill silence between the Burg and Monument Square, which experts say accounts for 90 percent of rural conversation on 36.

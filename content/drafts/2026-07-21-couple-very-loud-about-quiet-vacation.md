@@ -9,8 +9,8 @@ top_story: false
 featured: true
 ---
 
-**MECHANICSBURG** — After 48 hours at a place on **Indian Lake** (Logan County, but try telling that to a Burg group chat), a local couple returned transformed into evangelists for silence, posting 34 photos of water and three captions about “unplugging” to a phone they never put down.
+MECHANICSBURG — After 48 hours at a place on Indian Lake (Logan County, but try telling that to a Burg group chat), a local couple returned transformed into evangelists for silence, posting 34 photos of water and three captions about “unplugging” to a phone they never put down.
 
-“You forget what matters,” said the husband, while AirDropping a sunrise to his entire **Indians** softball league.
+“You forget what matters,” said the husband, while AirDropping a sunrise to his entire Indians softball league.
 
-Friends politely typed “looks peaceful!!” from **Main Street**, then muted the thread for the rest of the summer.
+Friends politely typed “looks peaceful!!” from Main Street, then muted the thread for the rest of the summer.
