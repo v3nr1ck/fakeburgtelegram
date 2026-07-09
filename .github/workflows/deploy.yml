@@ -7,8 +7,12 @@ on:
   workflow_dispatch:
   # Daily rebuild so future-dated articles go live automatically
   schedule:
-    # 11:00 UTC ≈ 7:00 AM Eastern (winter) / 6–7 AM range year-round-ish
+    # 11:00 UTC ≈ 7:00 AM Eastern
     - cron: "0 11 * * *"
+
+# Required so github-actions[bot] can push the built HTML back to main
+permissions:
+  contents: write
 
 concurrency:
   group: deploy-site
@@ -25,7 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          # Explicit token with write (from permissions: contents: write above)
           token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
 
       - uses: actions/setup-python@v5
         with:
@@ -62,5 +68,5 @@ jobs:
             echo "No changes to publish"
           else
             git commit -m "chore: publish built site [skip ci]"
-            git push
+            git push origin HEAD:main
           fi
