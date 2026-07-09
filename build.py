@@ -459,19 +459,63 @@ def render_sidebar(site: dict, articles: list[dict], exclude_slug: str | None = 
 """
 
 
-def shell(site: dict, title: str, body: str, description: str = "") -> str:
+def absolute_url(site: dict, path: str) -> str:
+    """Build https://domain/path for Open Graph / canonical (Facebook requires absolute URLs)."""
+    domain = (site.get("domain") or "fakeburgtelegram.com").strip().rstrip("/")
+    if not path:
+        path = "/"
+    if path.startswith("http://") or path.startswith("https://"):
+        return path
+    if not path.startswith("/"):
+        path = "/" + path
+    return f"https://{domain}{path}"
+
+
+def shell(
+    site: dict,
+    title: str,
+    body: str,
+    description: str = "",
+    *,
+    path: str = "/",
+    image: str = "",
+    og_type: str = "website",
+) -> str:
     site_name = site["name"]
     full_title = f"{title} — {site_name}" if title != site_name else site_name
     desc = description or site.get("tagline") or site_name
+    # Facebook scrapes og:* tags; relative image URLs fail — always absolute
+    img = image or "/assets/img/og-default.png"
+    if img and not (img.startswith("http://") or img.startswith("https://")):
+        if not img.startswith("/"):
+            img = "/" + img
+    canonical = absolute_url(site, path)
+    og_image = absolute_url(site, img)
     return f"""<!DOCTYPE html>
-<html lang="en">
+<html lang="en" prefix="og: https://ogp.me/ns#">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{html.escape(full_title)}</title>
   <meta name="description" content="{html.escape(desc)}">
   <meta name="robots" content="index,follow">
-  <link rel="canonical" href="https://{html.escape(site.get('domain','fakeburgtelegram.com'))}/">
+  <link rel="canonical" href="{html.escape(canonical)}">
+  <!-- Open Graph (Facebook, iMessage, LinkedIn, etc.) -->
+  <meta property="og:site_name" content="{html.escape(site_name)}">
+  <meta property="og:title" content="{html.escape(title)}">
+  <meta property="og:description" content="{html.escape(desc)}">
+  <meta property="og:type" content="{html.escape(og_type)}">
+  <meta property="og:url" content="{html.escape(canonical)}">
+  <meta property="og:image" content="{html.escape(og_image)}">
+  <meta property="og:image:secure_url" content="{html.escape(og_image)}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_US">
+  <!-- Twitter / X card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{html.escape(title)}">
+  <meta name="twitter:description" content="{html.escape(desc)}">
+  <meta name="twitter:image" content="{html.escape(og_image)}">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&family=Open+Sans:wght@400;600;700&family=Roboto:wght@400;700;900&display=swap" rel="stylesheet">
@@ -612,7 +656,18 @@ def build_home(site: dict, articles: list[dict]):
   {render_sidebar(site, articles)}
 </div>
 """
-    write_file("index.html", shell(site, site["name"], body, site.get("tagline", "")))
+    write_file(
+        "index.html",
+        shell(
+            site,
+            site["name"],
+            body,
+            site.get("tagline", ""),
+            path="/",
+            image="/assets/img/og-default.png",
+            og_type="website",
+        ),
+    )
 
 
 def build_article(site: dict, articles: list[dict], a: dict):
@@ -651,7 +706,19 @@ def build_article(site: dict, articles: list[dict], a: dict):
 """
     # path: /YYYY/MM/DD/slug/index.html
     rel = f"{a['date'].strftime('%Y/%m/%d')}/{a['slug']}/index.html"
-    write_file(rel, shell(site, a["title"], body, a["excerpt"]))
+    page_path = a["url"]  # e.g. /2026/07/08/slug/
+    write_file(
+        rel,
+        shell(
+            site,
+            a["title"],
+            body,
+            a["excerpt"],
+            path=page_path,
+            image=a.get("image") or "",
+            og_type="article",
+        ),
+    )
 
 
 def build_category(site: dict, articles: list[dict], cat: str):
@@ -684,7 +751,10 @@ def build_category(site: dict, articles: list[dict], cat: str):
   {render_sidebar(site, articles)}
 </div>
 """
-    write_file(f"category/{cat}/index.html", shell(site, name, body, desc))
+    write_file(
+        f"category/{cat}/index.html",
+        shell(site, name, body, desc, path=f"/category/{cat}/", og_type="website"),
+    )
 
 
 def build_static_page(site: dict, articles: list[dict], slug: str, title: str, inner: str):
@@ -697,7 +767,10 @@ def build_static_page(site: dict, articles: list[dict], slug: str, title: str, i
   {render_sidebar(site, articles)}
 </div>
 """
-    write_file(f"{slug}/index.html", shell(site, title, body))
+    write_file(
+        f"{slug}/index.html",
+        shell(site, title, body, path=f"/{slug}/", og_type="website"),
+    )
 
 
 def form_page(title: str, fields_note: str) -> str:
