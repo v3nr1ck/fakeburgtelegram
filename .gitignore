@@ -12,5 +12,5 @@ venv/
 .vscode/
 *.swp
 
-# Built site is generated in CI — don't commit dist unless you prefer manual deploys
+# Local build output (published copy lives in docs/ for GitHub Pages)
 dist/

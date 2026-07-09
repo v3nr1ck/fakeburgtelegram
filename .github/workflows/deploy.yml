@@ -1,4 +1,4 @@
-# Build Markdown → static HTML and publish to GitHub Pages
+# Build Markdown → static HTML into docs/ and publish to GitHub Pages
 name: Deploy to GitHub Pages
 
 on:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,18 +29,31 @@ jobs:
         run: |
           pip install pyyaml
           python build.py
+          rm -rf docs
+          cp -r dist docs
+          echo "fakeburgtelegram.com" > docs/CNAME
+
+      # Keep docs/ on main so "Deploy from branch → /docs" always works
+      - name: Commit docs to main
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f docs
+          if git diff --staged --quiet; then
+            echo "No docs changes"
+          else
+            git commit -m "chore: rebuild site into docs/ [skip ci]"
+            git push
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
+          path: docs
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
+      - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v4
