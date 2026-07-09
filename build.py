@@ -12,15 +12,25 @@ Output goes to dist/ — open dist/index.html or serve with:
 from __future__ import annotations
 
 import html
+import os
 import re
 import shutil
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
+
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    ZoneInfo = None  # type: ignore
 
 try:
     import yaml
 except ImportError:
     yaml = None
+
+# Articles with date/publish_date after "today" stay off the public site until the daily rebuild.
+# Timezone for "what day is it" (Eastern = Champaign County / Ohio).
+SITE_TZ = "America/New_York"
 
 ROOT = Path(__file__).resolve().parent
 CONTENT = ROOT / "content"
@@ -224,25 +234,73 @@ def slugify(s: str) -> str:
 def parse_date(d) -> datetime:
     if isinstance(d, datetime):
         return d
+    if isinstance(d, date) and not isinstance(d, datetime):
+        return datetime(d.year, d.month, d.day)
     if not d:
         return datetime.now()
-    s = str(d)
+    s = str(d)[:10]
     for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%B %d, %Y", "%b %d, %Y"):
         try:
-            return datetime.strptime(s, fmt)
+            return datetime.strptime(str(d), fmt) if fmt.startswith("%B") or fmt.startswith("%b") else datetime.strptime(s, fmt)
         except ValueError:
             continue
     return datetime.now()
 
 
-def load_articles() -> list[dict]:
+def today_site() -> date:
+    """Calendar day in site timezone (used for scheduled publishing)."""
+    if ZoneInfo is not None:
+        return datetime.now(ZoneInfo(SITE_TZ)).date()
+    return date.today()
+
+
+def truthy(val) -> bool:
+    if isinstance(val, bool):
+        return val
+    if val is None:
+        return False
+    return str(val).strip().lower() in ("1", "true", "yes", "on")
+
+
+def load_articles(*, include_scheduled: bool | None = None) -> list[dict]:
+    """
+    Load articles from content/articles/.
+
+    By default, only articles that are "live" today appear on the site:
+      - draft: true  → never published
+      - publish_date (or date if publish_date missing) must be <= today (America/New_York)
+
+    Set include_scheduled=True, or env BUILD_INCLUDE_SCHEDULED=1, to build everything
+    (useful for local preview of tomorrow's queue).
+    """
+    if include_scheduled is None:
+        include_scheduled = os.environ.get("BUILD_INCLUDE_SCHEDULED", "").strip() in (
+            "1",
+            "true",
+            "yes",
+        )
+
+    today = today_site()
     items = []
+    skipped = []
     if not ARTICLES.exists():
         return items
     for path in sorted(ARTICLES.glob("*.md")):
         meta, body = parse_frontmatter(path.read_text(encoding="utf-8"))
         title = meta.get("title") or path.stem
         date = parse_date(meta.get("date"))
+        # When the story goes live on the homepage (can differ from byline date)
+        go_live = parse_date(meta.get("publish_date") or meta.get("date")).date()
+        is_draft = truthy(meta.get("draft"))
+        scheduled = go_live > today
+
+        if is_draft and not include_scheduled:
+            skipped.append(f"  draft: {path.name}")
+            continue
+        if scheduled and not include_scheduled:
+            skipped.append(f"  scheduled {go_live.isoformat()}: {path.name}")
+            continue
+
         slug = meta.get("slug") or slugify(title)
         cats = meta.get("categories") or meta.get("category") or "news"
         if isinstance(cats, str):
@@ -254,6 +312,9 @@ def load_articles() -> list[dict]:
             "date": date,
             "date_str": date.strftime("%B %d, %Y"),
             "date_iso": date.strftime("%Y-%m-%d"),
+            "publish_date": go_live,
+            "scheduled": scheduled,
+            "draft": is_draft,
             "categories": cats,
             "primary_category": cats[0],
             "author": meta.get("author") or "Staff report",
@@ -269,6 +330,10 @@ def load_articles() -> list[dict]:
         }
         items.append(item)
     items.sort(key=lambda a: a["date"], reverse=True)
+    if skipped:
+        print(f"Held back {len(skipped)} article(s) until go-live date (today={today.isoformat()} {SITE_TZ}):")
+        for line in skipped:
+            print(line)
     return items
 
 
@@ -895,7 +960,7 @@ def build():
         shutil.copytree(ASSETS, DIST / "assets")
 
     articles = load_articles()
-    print(f"Loaded {len(articles)} articles")
+    print(f"Loaded {len(articles)} live article(s) for {today_site().isoformat()} ({SITE_TZ})")
 
     build_home(site, articles)
     for a in articles:

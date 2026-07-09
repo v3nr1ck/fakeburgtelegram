@@ -1,10 +1,14 @@
-# Build the newspaper into the repo root (GitHub Pages is set to main / root)
+# Build the newspaper into the repo root (GitHub Pages = main / root)
 name: Deploy site
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Daily rebuild so future-dated articles go live automatically
+  schedule:
+    # 11:00 UTC ≈ 7:00 AM Eastern (winter) / 6–7 AM range year-round-ish
+    - cron: "0 11 * * *"
 
 concurrency:
   group: deploy-site
@@ -13,8 +17,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Only rebuild when content/source changes — skip our own rebuild commits
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    # Skip bot's own "publish built site" commits on push; always run on schedule / manual
+    if: >
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' && !contains(github.event.head_commit.message, '[skip ci]'))
     steps:
       - uses: actions/checkout@v4
         with:
@@ -24,7 +31,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Build site
+      - name: Build site (respects article dates / publish_date)
+        env:
+          TZ: America/New_York
         run: |
           pip install pyyaml
           python build.py
@@ -35,13 +44,13 @@ jobs:
           # wipe previous generated page trees (keep source)
           rm -rf about category classifieds contact letter-to-the-editor privacy-policy search \
                  submit-an-obituary submit-anniversary submit-birth submit-engagement \
-                 submit-guest-column submit-news-tip submit-scores submit-wedding weather 2026 docs
+                 submit-guest-column submit-news-tip submit-scores submit-wedding weather \
+                 2025 2026 2027 docs
           rm -f index.html robots.txt rss.xml
           # copy fresh build
           cp -a dist/. .
           echo "fakeburgtelegram.com" > CNAME
           touch .nojekyll
-          # keep developer readme out of Pages homepage slot
           if [ -f README.md ]; then mv -f README.md DEV-README.md; fi
 
       - name: Commit and push
