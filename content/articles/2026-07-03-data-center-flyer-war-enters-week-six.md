@@ -12,8 +12,8 @@ top_story: true
 
 Pro-development flyers promise jobs, tax base, and “the future.” Opposition flyers promise noise, water use, and “the future, but worse.”
 
-Both sides urge residents to attend a meeting neither side can agree on the date of.
+Both sides urge residents to attend a meeting neither side can agree on the date of — possibly in Urbana, possibly “somewhere with parking,” which rules out half of **Monument Square** on a Saturday.
 
-“I just want someone to mow the berm on U.S. 36,” said one Mechanicsburg voter. “Is that on the flyer?”
+“I just want someone to mow the berm on **U.S. 36**,” said one Mechanicsburg voter. “Is that on the flyer?”
 
 It was not.

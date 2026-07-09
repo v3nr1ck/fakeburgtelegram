@@ -7,8 +7,8 @@ author: Submitted
 excerpt: Local service club celebrates perfect attendance and excellent pancake-flip form.
 ---
 
-**MECHANICSBURG** — Rotary presented a small plaque and a large round of applause to a member who attended every meeting this quarter without once claiming to be “stuck behind a train.”
+**MECHANICSBURG** — Rotary presented a small plaque and a large round of applause to a member who attended every meeting this quarter without once claiming to be “stuck behind a train” on the way in from **US-36**.
 
-The honoree credited coffee and guilt.
+The honoree credited coffee — possibly from **Hemisphere** or **Simple Coffee**, sources differ — and guilt.
 
 Upcoming projects include a park cleanup and a fundraiser where the raffle prize is more raffle tickets.

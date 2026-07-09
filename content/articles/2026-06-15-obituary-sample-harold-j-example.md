@@ -9,7 +9,7 @@ excerpt: Sample obituary format for the site — replace with real paid notices 
 
 **MECHANICSBURG** — Harold J. Example, 84, of Mechanicsburg, passed away peacefully in this *sample obituary* used to demonstrate site layout.
 
-He loved coffee that had been burning for hours, high school sports, and explaining weather better than the TV.
+He loved coffee that had been burning for hours, **Indians** football on Friday nights, and explaining the weather better than the TV — usually from a porch within shouting distance of **Main Street**.
 
 A real notice would list service times, survivors, and memorial contributions. This one does not, because Harold is fictional.
 
