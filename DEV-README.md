@@ -2,7 +2,27 @@
 
 Static local newspaper site for **fakeburgtelegram.com** — Mechanicsburg & Champaign County, Ohio.
 
-Looks and navigates like a classic Midwest daily (full nav, sections, article pages, weather widget, classifieds, submit forms). Content is **Markdown files** you edit yourself — no WordPress admin to learn.
+## Local CMS (free “WordPress-like” editor)
+
+Double-click **`launch-admin.bat`**, or:
+
+```powershell
+cd C:\Users\comfy\Pictures\projects\fakeburg-telegram
+pip install -r requirements.txt
+python admin.py
+```
+
+Open **http://127.0.0.1:5050**
+
+| You can… | How |
+|----------|-----|
+| Add a new article | **New article** → headline, body, sections, photo |
+| Edit existing copy | **All articles** → **Edit** |
+| Add/replace photos | On the edit screen → choose image file |
+| Homepage hero | Check **Feature on homepage** |
+| Go live | **Publish** → Build & git push |
+
+Runs **only on your PC** (not public). Hosting stays free on GitHub Pages.
 
 ---
 
