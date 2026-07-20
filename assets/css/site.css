@@ -657,139 +657,217 @@ img { max-width: 100%; height: auto; display: block; }
   margin-top: 0.75rem;
 }
 
-/* —— Champaign Voices (American Voices–style) —— */
-.section-voices {
-  background: var(--bg-soft);
-  border: 1px solid var(--border);
-  padding: 1.25rem 1.25rem 0.5rem;
-  margin-left: -0.25rem;
-  margin-right: -0.25rem;
-}
-
-.voices-kicker {
-  margin: -0.35rem 0 1rem;
-  font-size: 13px;
-  color: var(--text-muted);
-  font-style: italic;
+/* —— Champaign Voices (modeled on The Onion American Voices) —— */
+.section-voices,
+.voices-article,
+.voices-index {
+  max-width: 42rem;
 }
 
 .voices-home-list {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 3rem;
 }
 
 .voices-teaser {
-  background: #fff;
-  border: 1px solid var(--border);
-  padding: 1.15rem 1.15rem 0.85rem;
+  background: transparent;
+  border: 0;
+  padding: 0;
 }
 
-.voices-teaser .story-title {
-  font-size: 1.2rem;
-  margin-bottom: 0.45rem;
+.voices-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #2f9e44; /* Onion-adjacent green kicker */
 }
 
-.voices-lede,
-.voices-lede-full {
+.voices-eyebrow a {
+  color: inherit;
+}
+
+.voices-eyebrow a:hover {
+  color: #237a34;
+}
+
+.voices-headline {
+  margin: 0 0 0.65rem;
+  font-family: Georgia, "Times New Roman", "Liberation Serif", serif;
+  font-weight: 700;
+  font-size: clamp(1.65rem, 3.2vw, 2.35rem);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: #111;
+}
+
+.voices-headline a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.voices-headline a:hover {
+  color: var(--brand);
+}
+
+.voices-date {
   margin: 0 0 1rem;
-  color: #333;
-  font-size: 0.98rem;
-  line-height: 1.5;
-  max-width: 46rem;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.01em;
 }
 
-.voices-lede-full {
-  font-size: 1.08rem;
-  margin: 0.75rem 0 1.5rem;
+.voices-lede {
+  margin: 0 0 0.5rem;
+  color: #222;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  max-width: 40rem;
 }
 
-.voices-more,
+.voices-lede .voices-what {
+  font-style: italic;
+  font-weight: 600;
+}
+
 .voices-index-link {
-  margin: 0.75rem 0 0.25rem;
-  font-size: 13px;
+  margin: 1.25rem 0 0;
+  font-size: 14px;
   font-weight: 700;
 }
 
+.voices-more-list {
+  list-style: none;
+  margin: 1.5rem 0 0;
+  padding: 1rem 0 0;
+  border-top: 1px solid var(--border);
+}
+
+.voices-more-list li {
+  margin: 0.45rem 0;
+  font-weight: 600;
+}
+
+.voices-date-inline {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+/* Quote rows — circle left, text right (Onion layout) */
 .voices-people {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem 1rem;
-  margin: 0.5rem 0 0.25rem;
-}
-
-.voices-people.compact {
-  gap: 0.85rem 0.65rem;
-}
-
-@media (max-width: 720px) {
-  .voices-people {
-    grid-template-columns: 1fr;
-  }
+  display: flex;
+  flex-direction: column;
+  margin: 1.25rem 0 0;
+  border-top: 1px solid #e8e8e8;
 }
 
 .voice-person {
-  margin: 0;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 132px 1fr;
+  gap: 1.15rem 1.5rem;
   align-items: center;
-  gap: 0.55rem;
+  margin: 0;
+  padding: 1.35rem 0;
+  border-bottom: 1px solid #e8e8e8;
+  text-align: left;
 }
 
-.voice-portrait {
-  width: 88px;
-  height: 88px;
+@media (max-width: 560px) {
+  .voice-person {
+    grid-template-columns: 96px 1fr;
+    gap: 0.85rem 1rem;
+    align-items: start;
+  }
+}
+
+/* Hard circular crop so faces read like American Voices headshots */
+.voice-portrait-wrap {
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid #fff;
-  box-shadow: 0 0 0 1px var(--border);
-  background: #ddd;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #d0d0d0;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06);
 }
 
-.voices-people.compact .voice-portrait {
-  width: 64px;
-  height: 64px;
+@media (max-width: 560px) {
+  .voice-portrait-wrap {
+    width: 88px;
+    height: 88px;
+  }
+}
+
+/* Override global `img { max-width:100%; height:auto }` so circles actually crop */
+.voice-portrait-wrap img.voice-portrait,
+.voice-portrait {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  display: block;
+  object-fit: cover;
+  /* Bias crop toward faces (stock shots are upper-body) */
+  object-position: center 18%;
+  border: 0;
+  border-radius: 0;
+}
+
+.voice-text {
+  min-width: 0;
 }
 
 .voice-quote {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: 0.98rem;
+  margin: 0 0 0.45rem;
+  padding: 0;
+  border: 0;
+  font-family: Georgia, "Times New Roman", "Liberation Serif", serif;
+  font-size: clamp(1.15rem, 2.2vw, 1.4rem);
   font-weight: 700;
+  font-style: normal;
   line-height: 1.35;
   color: #111;
   quotes: none;
 }
 
-.voices-people.compact .voice-quote {
-  font-size: 0.88rem;
-}
-
 .voice-id {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
-  font-size: 12px;
-  line-height: 1.3;
+  display: block;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: #5a5a5a;
+  font-style: normal;
 }
 
 .voice-name {
-  font-weight: 700;
-  color: #111;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  font-size: 11px;
+  font-weight: 600;
+  color: #444;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: inherit;
+}
+
+.voice-comma {
+  color: #5a5a5a;
 }
 
 .voice-job {
-  color: var(--text-muted);
-  font-style: italic;
-  font-size: 12px;
+  font-weight: 400;
+  font-style: normal;
+  color: #5a5a5a;
+  font-size: inherit;
 }
 
-.voices-article .article-title {
-  max-width: 40rem;
+.voices-index-header h1 {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.voices-article .breadcrumb {
+  margin-bottom: 1rem;
 }
 
 /* Footer */

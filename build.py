@@ -829,35 +829,58 @@ def grid_section(title: str, cat: str, items: list[dict]) -> str:
 
 
 def voices_people_html(people: list[dict], *, compact: bool = False) -> str:
+    """Onion American Voices layout: circular headshot left, quote + name/job right."""
     cls = "voices-people compact" if compact else "voices-people"
     cards = []
     for p in people:
         cards.append(
             f"""
       <figure class="voice-person">
-        <img class="voice-portrait" src="{html.escape(p['portrait_url'])}" alt="" width="96" height="96" loading="lazy">
-        <blockquote class="voice-quote">“{html.escape(p['quote'])}”</blockquote>
-        <figcaption class="voice-id">
-          <span class="voice-name">{html.escape(p['name'])}</span>
-          <span class="voice-job">{html.escape(p['title'])}</span>
-        </figcaption>
+        <div class="voice-portrait-wrap" aria-hidden="true">
+          <img class="voice-portrait" src="{html.escape(p['portrait_url'])}" alt="" loading="lazy" width="160" height="160">
+        </div>
+        <div class="voice-text">
+          <blockquote class="voice-quote">“{html.escape(p['quote'])}”</blockquote>
+          <figcaption class="voice-id">
+            <span class="voice-name">{html.escape(p['name'])}</span><span class="voice-comma">, </span><span class="voice-job">{html.escape(p['title'])}</span>
+          </figcaption>
+        </div>
       </figure>
 """
         )
     return f'<div class="{cls}">{"".join(cards)}</div>'
 
 
-def voices_teaser_card(v: dict) -> str:
-    """Homepage / index teaser: headline + lede snippet + mini people strip."""
-    people_mini = voices_people_html(v["people"][:3], compact=True)
-    lede = html.escape(v.get("lede") or v.get("excerpt") or "")
+def voices_lede_html(lede: str) -> str:
+    """Render lede; lightly emphasize trailing 'What do you think?' like The Onion."""
+    text = (lede or "").strip()
+    if not text:
+        return ""
+    marker = "What do you think?"
+    # case-insensitive find of the classic closer
+    lower = text.lower()
+    idx = lower.rfind(marker.lower())
+    if idx >= 0:
+        before = html.escape(text[:idx])
+        phrase = html.escape(text[idx : idx + len(marker)])
+        after = html.escape(text[idx + len(marker) :])
+        body = f'{before}<em class="voices-what">{phrase}</em>{after}'
+    else:
+        body = html.escape(text)
+    return f'<p class="voices-lede">{body}</p>'
+
+
+def voices_teaser_card(v: dict, *, show_people: bool = True) -> str:
+    """Full Onion-style package (used on homepage + index)."""
+    people = voices_people_html(v["people"][:3], compact=False) if show_people else ""
+    lede = voices_lede_html(v.get("lede") or v.get("excerpt") or "")
     return f"""
 <article class="voices-teaser">
-  <div class="story-cat">Champaign Voices</div>
-  <h3 class="story-title"><a href="{v['url']}">{html.escape(v['title'])}</a></h3>
-  <p class="voices-lede">{lede}</p>
-  {people_mini}
-  <p class="voices-more"><a href="{v['url']}">Full reactions →</a></p>
+  <p class="voices-eyebrow"><a href="/champaign-voices/">Champaign Voices</a></p>
+  <h2 class="voices-headline"><a href="{v['url']}">{html.escape(v['title'])}</a></h2>
+  <p class="voices-date">Published: {html.escape(v['date_str'])}</p>
+  {lede}
+  {people}
 </article>
 """
 
@@ -870,12 +893,20 @@ def voices_home_section(title: str, items: list[dict]) -> str:
             f'<p class="empty-state">No Champaign Voices yet. Add files under content/voices/.</p>'
             f"</section>"
         )
-    cards = "".join(voices_teaser_card(v) for v in items)
+    # Homepage: latest piece in full Onion layout (not a cramped grid of three)
+    lead = voices_teaser_card(items[0], show_people=True)
+    more = ""
+    if len(items) > 1:
+        links = "".join(
+            f'<li><a href="{v["url"]}">{html.escape(v["title"])}</a>'
+            f'<span class="voices-date-inline">{html.escape(v["date_str"])}</span></li>'
+            for v in items[1:3]
+        )
+        more = f'<ul class="voices-more-list">{links}</ul>'
     return f"""
 <section class="section section-voices">
-  <h2 class="block-title"><a href="/champaign-voices/">{html.escape(title)}</a></h2>
-  <p class="voices-kicker">What regular people think about the news — allegedly.</p>
-  <div class="voices-home-list">{cards}</div>
+  {lead}
+  {more}
   <p class="voices-index-link"><a href="/champaign-voices/">More Champaign Voices →</a></p>
 </section>
 """
@@ -997,15 +1028,15 @@ def build_voice_piece(site: dict, articles: list[dict], voices: list[dict], v: d
         f'<a href="/champaign-voices/">Champaign Voices</a> › '
         f'{html.escape(v["title"])}</nav>'
     )
-    lede_html = f'<p class="voices-lede-full">{html.escape(v["lede"])}</p>' if v.get("lede") else ""
+    lede_html = voices_lede_html(v.get("lede") or "")
     people = voices_people_html(v["people"], compact=False)
     body = f"""
 <div class="layout-main">
   <article class="content-col voices-article">
     {crumbs}
-    <div class="story-cat">Champaign Voices</div>
-    <h1 class="article-title">{html.escape(v["title"])}</h1>
-    <div class="article-byline">{html.escape(v["author"])} — {v["date_str"]}</div>
+    <p class="voices-eyebrow">Champaign Voices</p>
+    <h1 class="voices-headline">{html.escape(v["title"])}</h1>
+    <p class="voices-date">Published: {html.escape(v["date_str"])}</p>
     {lede_html}
     {people}
   </article>
@@ -1033,10 +1064,10 @@ def build_voices_index(site: dict, articles: list[dict], voices: list[dict]):
     )
     body = f"""
 <div class="layout-main">
-  <div class="content-col">
-    <header class="page-header">
+  <div class="content-col voices-index">
+    <header class="page-header voices-index-header">
       <h1>Champaign Voices</h1>
-      <p>What regular people think about the news — allegedly. Same faces, different names and jobs, every time.</p>
+      <p>What regular people think about the news — allegedly.</p>
     </header>
     <div class="voices-home-list">{list_html}</div>
   </div>
