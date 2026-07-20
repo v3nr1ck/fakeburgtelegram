@@ -17,10 +17,11 @@ Open **http://127.0.0.1:5050**
 | You can… | How |
 |----------|-----|
 | Add a new article | **New article** → headline, body, sections, photo |
-| Edit existing copy | **All articles** → **Edit** |
-| Add/replace photos | On the edit screen → choose image file |
+| Edit existing copy | **Articles** → **Edit** |
+| **Champaign Voices** | **Champaign Voices** → headline + lede + 3 quotes/faces |
+| Add/replace photos | On the article edit screen → choose image file |
 | Homepage hero | Check **Feature on homepage** |
-| Go live | **Publish** → Build & git push |
+| Go live | **Publish** → Build & git push (articles + voices) |
 
 Runs **only on your PC** (not public). Hosting stays free on GitHub Pages.
 
@@ -49,6 +50,24 @@ python -m http.server 8080 --directory dist
 ```
 
 Open http://localhost:8080
+
+---
+
+## Writing satire (local authenticity)
+
+Full LLM instruct + county reference brain (roads, lore, surnames, mascots, businesses, variety rules):
+
+`references/CHAMPAIGN-COUNTY-INSTRUCT.md`
+
+Shorter place/business cheat-sheet: `references/CHAMPAIGN-COUNTY-LOCAL-BIBLE.md`
+
+### Champaign Voices (American Voices–style)
+
+Short reaction packages: headline + lede ending “What do you think?” + **3** quotes from locals with **fixed portraits** (new name/job each time).
+
+- Content: `content/voices/*.md` (see README there)
+- Live index: `/champaign-voices/`
+- Homepage block: after Top Stories
 
 ---
 

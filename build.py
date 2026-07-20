@@ -35,10 +35,17 @@ SITE_TZ = "America/New_York"
 ROOT = Path(__file__).resolve().parent
 CONTENT = ROOT / "content"
 ARTICLES = CONTENT / "articles"
+VOICES = CONTENT / "voices"
 PAGES = CONTENT / "pages"
 ASSETS = ROOT / "assets"
 DIST = ROOT / "dist"
 SITE_YAML = ROOT / "site.yaml"
+
+from voices_portraits import (  # noqa: E402
+    MIN_VOICE_PEOPLE,
+    normalize_portrait_id,
+    portrait_url,
+)
 
 
 def load_yaml(path: Path) -> dict:
@@ -337,6 +344,120 @@ def load_articles(*, include_scheduled: bool | None = None) -> list[dict]:
     return items
 
 
+def _normalize_voice_people(raw) -> list[dict]:
+    """Normalize people list from YAML frontmatter (stock cast IDs)."""
+    people: list[dict] = []
+    if not raw:
+        return people
+    if not isinstance(raw, list):
+        return people
+    for i, p in enumerate(raw):
+        if not isinstance(p, dict):
+            continue
+        portrait = normalize_portrait_id(p.get("portrait"), fallback_index=i)
+        name = str(p.get("name") or "Local Resident").strip()
+        title = str(p.get("title") or "Concerned Citizen").strip()
+        quote = str(p.get("quote") or "").strip().strip('"').strip("'")
+        if not quote:
+            continue
+        people.append(
+            {
+                "portrait": portrait,
+                "portrait_url": portrait_url(portrait),
+                "name": name,
+                "title": title,
+                "quote": quote,
+            }
+        )
+    return people
+
+
+def load_voices(*, include_scheduled: bool | None = None) -> list[dict]:
+    """
+    Load Champaign Voices pieces from content/voices/.
+
+    Same draft/schedule rules as articles. Each piece is a short “American Voices”
+    style reaction package: headline + lede + 3 quoted locals with fixed portraits.
+    """
+    if include_scheduled is None:
+        include_scheduled = os.environ.get("BUILD_INCLUDE_SCHEDULED", "").strip() in (
+            "1",
+            "true",
+            "yes",
+        )
+
+    today = today_site()
+    items: list[dict] = []
+    skipped: list[str] = []
+    if not VOICES.exists():
+        return items
+
+    for path in sorted(VOICES.glob("*.md")):
+        if path.name.upper() in ("README.MD", "INDEX.MD"):
+            continue
+        meta, body = parse_frontmatter(path.read_text(encoding="utf-8"))
+        title = meta.get("title") or path.stem
+        date = parse_date(meta.get("date"))
+        go_live = parse_date(meta.get("publish_date") or meta.get("date")).date()
+        is_draft = truthy(meta.get("draft"))
+        scheduled = go_live > today
+
+        if is_draft and not include_scheduled:
+            skipped.append(f"  draft: {path.name}")
+            continue
+        if scheduled and not include_scheduled:
+            skipped.append(f"  scheduled {go_live.isoformat()}: {path.name}")
+            continue
+
+        people = _normalize_voice_people(meta.get("people") or meta.get("voices"))
+        if len(people) < MIN_VOICE_PEOPLE:
+            skipped.append(
+                f"  need ≥{MIN_VOICE_PEOPLE} people quotes: {path.name} (has {len(people)})"
+            )
+            continue
+
+        lede = (meta.get("lede") or meta.get("prompt") or meta.get("excerpt") or "").strip()
+        if not lede:
+            # Fall back to body first paragraph
+            lede = first_sentence(body) if body.strip() else ""
+        if lede and not lede.rstrip().endswith("?"):
+            # Soft encourage Onion cadence; don't force if author used other punctuation
+            pass
+
+        slug = meta.get("slug") or slugify(title)
+        excerpt = lede[:200] + ("…" if len(lede) > 200 else "")
+        item = {
+            "title": title,
+            "slug": slug,
+            "date": date,
+            "date_str": date.strftime("%B %d, %Y"),
+            "date_iso": date.strftime("%Y-%m-%d"),
+            "publish_date": go_live,
+            "scheduled": scheduled,
+            "draft": is_draft,
+            "categories": ["voices"],
+            "primary_category": "voices",
+            "author": meta.get("author") or "Champaign Voices",
+            "excerpt": excerpt or title,
+            "lede": lede,
+            "people": people,
+            "image": people[0]["portrait_url"] if people else "",
+            "featured": bool(meta.get("featured", False)),
+            "top_story": False,
+            "kind": "voices",
+            "url": f"/champaign-voices/{date.strftime('%Y/%m/%d')}/{slug}/",
+            "path": path,
+        }
+        items.append(item)
+
+    items.sort(key=lambda a: a["date"], reverse=True)
+    if skipped:
+        print(f"Held back {len(skipped)} voices piece(s) (today={today.isoformat()} {SITE_TZ}):")
+        for line in skipped:
+            print(line)
+    return items
+
+
 def first_sentence(text: str) -> str:
     text = re.sub(r"\s+", " ", text.strip())
     text = re.sub(r"^#+\s*", "", text)
@@ -397,6 +518,7 @@ _CAT_LABELS = {
     "special-sections": "Special Sections",
     "fair": "Fair",
     "obituaries": "Obituaries",
+    "voices": "Champaign Voices",
 }
 
 
@@ -480,7 +602,12 @@ def render_footer(site: dict) -> str:
 """
 
 
-def render_sidebar(site: dict, articles: list[dict], exclude_slug: str | None = None) -> str:
+def render_sidebar(
+    site: dict,
+    articles: list[dict],
+    exclude_slug: str | None = None,
+    voices: list[dict] | None = None,
+) -> str:
     w = site.get("weather") or {}
     forecast = "".join(
         f'<div><span>{html.escape(str(d.get("day","")))}</span>{d.get("high","")}°</div>'
@@ -491,6 +618,21 @@ def render_sidebar(site: dict, articles: list[dict], exclude_slug: str | None = 
         f'<div class="side-story">{story_title_html(a, "h4")}{story_meta_html(a)}</div>'
         for a in recent
     )
+    voices = voices or []
+    voice_html = "".join(
+        f'<div class="side-story"><h4 class="story-title"><a href="{v["url"]}">{html.escape(v["title"])}</a></h4>'
+        f'<div class="story-meta">Champaign Voices · {v["date_str"]}</div></div>'
+        for v in voices[:4]
+        if v["slug"] != exclude_slug
+    )
+    voices_widget = ""
+    if voice_html:
+        voices_widget = f"""
+  <div class="widget">
+    <h3><a href="/champaign-voices/">Champaign Voices</a></h3>
+    {voice_html}
+  </div>
+"""
     return f"""
 <aside class="sidebar">
   <div class="widget">
@@ -516,6 +658,7 @@ def render_sidebar(site: dict, articles: list[dict], exclude_slug: str | None = 
     <strong>Parody notice</strong><br>
     {html.escape(site.get("parody_notice",""))}
   </div>
+  {voices_widget}
   <div class="widget">
     <h3>Latest</h3>
     {recent_html or '<p class="empty-state">No stories yet.</p>'}
@@ -685,6 +828,59 @@ def grid_section(title: str, cat: str, items: list[dict]) -> str:
 """
 
 
+def voices_people_html(people: list[dict], *, compact: bool = False) -> str:
+    cls = "voices-people compact" if compact else "voices-people"
+    cards = []
+    for p in people:
+        cards.append(
+            f"""
+      <figure class="voice-person">
+        <img class="voice-portrait" src="{html.escape(p['portrait_url'])}" alt="" width="96" height="96" loading="lazy">
+        <blockquote class="voice-quote">“{html.escape(p['quote'])}”</blockquote>
+        <figcaption class="voice-id">
+          <span class="voice-name">{html.escape(p['name'])}</span>
+          <span class="voice-job">{html.escape(p['title'])}</span>
+        </figcaption>
+      </figure>
+"""
+        )
+    return f'<div class="{cls}">{"".join(cards)}</div>'
+
+
+def voices_teaser_card(v: dict) -> str:
+    """Homepage / index teaser: headline + lede snippet + mini people strip."""
+    people_mini = voices_people_html(v["people"][:3], compact=True)
+    lede = html.escape(v.get("lede") or v.get("excerpt") or "")
+    return f"""
+<article class="voices-teaser">
+  <div class="story-cat">Champaign Voices</div>
+  <h3 class="story-title"><a href="{v['url']}">{html.escape(v['title'])}</a></h3>
+  <p class="voices-lede">{lede}</p>
+  {people_mini}
+  <p class="voices-more"><a href="{v['url']}">Full reactions →</a></p>
+</article>
+"""
+
+
+def voices_home_section(title: str, items: list[dict]) -> str:
+    if not items:
+        return (
+            f'<section class="section section-voices">'
+            f'<h2 class="block-title"><a href="/champaign-voices/">{html.escape(title)}</a></h2>'
+            f'<p class="empty-state">No Champaign Voices yet. Add files under content/voices/.</p>'
+            f"</section>"
+        )
+    cards = "".join(voices_teaser_card(v) for v in items)
+    return f"""
+<section class="section section-voices">
+  <h2 class="block-title"><a href="/champaign-voices/">{html.escape(title)}</a></h2>
+  <p class="voices-kicker">What regular people think about the news — allegedly.</p>
+  <div class="voices-home-list">{cards}</div>
+  <p class="voices-index-link"><a href="/champaign-voices/">More Champaign Voices →</a></p>
+</section>
+"""
+
+
 def write_file(rel: str, content: str):
     path = DIST / rel.lstrip("/").replace("/", "\\") if False else DIST / Path(rel.lstrip("/"))
     # ensure index.html for directory URLs
@@ -697,28 +893,36 @@ def write_file(rel: str, content: str):
     return path
 
 
-def build_home(site: dict, articles: list[dict]):
+def build_home(site: dict, articles: list[dict], voices: list[dict] | None = None):
+    voices = voices or []
     sections_html = []
     for sec in site.get("home_sections") or []:
-        cat = sec["category"]
-        items = by_category(articles, cat)[: int(sec.get("limit") or 8)]
+        layout = sec.get("layout") or "featured-list"
+        limit = int(sec.get("limit") or 8)
+        title = sec.get("title") or "Section"
+
+        if layout == "voices":
+            sections_html.append(voices_home_section(title, voices[:limit]))
+            continue
+
+        cat = sec.get("category") or "news"
+        items = by_category(articles, cat)[:limit]
         # also show top_story articles in top-stories
         if cat == "top-stories" and not items:
             items = [a for a in articles if a.get("top_story")][:5] or articles[:5]
-        layout = sec.get("layout") or "featured-list"
         if layout == "hero":
-            sections_html.append(hero_section(sec["title"], cat, items))
+            sections_html.append(hero_section(title, cat, items))
         elif layout == "grid":
-            sections_html.append(grid_section(sec["title"], cat, items))
+            sections_html.append(grid_section(title, cat, items))
         else:
-            sections_html.append(featured_list_section(sec["title"], cat, items))
+            sections_html.append(featured_list_section(title, cat, items))
 
     body = f"""
 <div class="layout-main">
   <div class="content-col">
     {''.join(sections_html)}
   </div>
-  {render_sidebar(site, articles)}
+  {render_sidebar(site, articles, voices=voices)}
 </div>
 """
     write_file(
@@ -735,7 +939,7 @@ def build_home(site: dict, articles: list[dict]):
     )
 
 
-def build_article(site: dict, articles: list[dict], a: dict):
+def build_article(site: dict, articles: list[dict], a: dict, voices: list[dict] | None = None):
     crumbs = (
         f'<nav class="breadcrumb"><a href="/">Home</a> › '
         f'<a href="/category/{a["primary_category"]}/">{html.escape(cat_name(site, a["primary_category"]))}</a> › '
@@ -766,7 +970,7 @@ def build_article(site: dict, articles: list[dict], a: dict):
       {a["body_html"]}
     </div>
   </article>
-  {render_sidebar(site, articles, exclude_slug=a["slug"])}
+  {render_sidebar(site, articles, exclude_slug=a["slug"], voices=voices)}
 </div>
 """
     # path: /YYYY/MM/DD/slug/index.html
@@ -782,6 +986,72 @@ def build_article(site: dict, articles: list[dict], a: dict):
             path=page_path,
             image=a.get("image") or "",
             og_type="article",
+        ),
+    )
+
+
+def build_voice_piece(site: dict, articles: list[dict], voices: list[dict], v: dict):
+    """Single Champaign Voices page (Onion American Voices layout)."""
+    crumbs = (
+        f'<nav class="breadcrumb"><a href="/">Home</a> › '
+        f'<a href="/champaign-voices/">Champaign Voices</a> › '
+        f'{html.escape(v["title"])}</nav>'
+    )
+    lede_html = f'<p class="voices-lede-full">{html.escape(v["lede"])}</p>' if v.get("lede") else ""
+    people = voices_people_html(v["people"], compact=False)
+    body = f"""
+<div class="layout-main">
+  <article class="content-col voices-article">
+    {crumbs}
+    <div class="story-cat">Champaign Voices</div>
+    <h1 class="article-title">{html.escape(v["title"])}</h1>
+    <div class="article-byline">{html.escape(v["author"])} — {v["date_str"]}</div>
+    {lede_html}
+    {people}
+  </article>
+  {render_sidebar(site, articles, exclude_slug=v["slug"], voices=voices)}
+</div>
+"""
+    rel = f"champaign-voices/{v['date'].strftime('%Y/%m/%d')}/{v['slug']}/index.html"
+    write_file(
+        rel,
+        shell(
+            site,
+            v["title"],
+            body,
+            v["excerpt"],
+            path=v["url"],
+            image=v.get("image") or "/assets/img/og-default.png",
+            og_type="article",
+        ),
+    )
+
+
+def build_voices_index(site: dict, articles: list[dict], voices: list[dict]):
+    list_html = "".join(voices_teaser_card(v) for v in voices) or (
+        '<p class="empty-state">No Champaign Voices yet. Add Markdown under content/voices/.</p>'
+    )
+    body = f"""
+<div class="layout-main">
+  <div class="content-col">
+    <header class="page-header">
+      <h1>Champaign Voices</h1>
+      <p>What regular people think about the news — allegedly. Same faces, different names and jobs, every time.</p>
+    </header>
+    <div class="voices-home-list">{list_html}</div>
+  </div>
+  {render_sidebar(site, articles, voices=voices)}
+</div>
+"""
+    write_file(
+        "champaign-voices/index.html",
+        shell(
+            site,
+            "Champaign Voices",
+            body,
+            "Local reactions to the news, Onion American Voices–style.",
+            path="/champaign-voices/",
+            og_type="website",
         ),
     )
 
@@ -903,7 +1173,7 @@ High {w.get('high')}° / Low {w.get('low')}° · Humidity {w.get('humidity')}% �
 """
     build_static_page(site, articles, "classifieds", "Classifieds", classifieds)
 
-    # Search (client-side list of titles)
+    # Search (client-side list of titles) — filled in build() with articles + voices
     links = "".join(
         f'<li><a href="{a["url"]}">{html.escape(a["title"])}</a> <span class="story-meta">{a["date_str"]} · {html.escape(cat_name(site, a["primary_category"]))}</span></li>'
         for a in articles
@@ -925,10 +1195,12 @@ High {w.get('high')}° / Low {w.get('low')}° · Humidity {w.get('humidity')}% �
     build_static_page(site, articles, "search", "Search", search_inner)
 
 
-def build_rss(site: dict, articles: list[dict]):
+def build_rss(site: dict, articles: list[dict], voices: list[dict] | None = None):
     items = []
     domain = site.get("domain") or "fakeburgtelegram.com"
-    for a in articles[:30]:
+    feed: list[dict] = list(articles) + list(voices or [])
+    feed.sort(key=lambda a: a["date"], reverse=True)
+    for a in feed[:40]:
         items.append(f"""
     <item>
       <title>{html.escape(a['title'])}</title>
@@ -960,20 +1232,60 @@ def build():
         shutil.copytree(ASSETS, DIST / "assets")
 
     articles = load_articles()
-    print(f"Loaded {len(articles)} live article(s) for {today_site().isoformat()} ({SITE_TZ})")
+    voices = load_voices()
+    print(
+        f"Loaded {len(articles)} live article(s) + {len(voices)} Champaign Voices "
+        f"for {today_site().isoformat()} ({SITE_TZ})"
+    )
 
-    build_home(site, articles)
+    build_home(site, articles, voices)
     for a in articles:
-        build_article(site, articles, a)
+        build_article(site, articles, a, voices)
+    for v in voices:
+        build_voice_piece(site, articles, voices, v)
+    build_voices_index(site, articles, voices)
 
     cats = set((site.get("categories") or {}).keys())
     for a in articles:
         cats.update(a["categories"])
+    # Don't build a empty category/voices from articles; we use /champaign-voices/
+    cats.discard("voices")
     for cat in sorted(cats):
         build_category(site, articles, cat)
 
     build_pages(site, articles)
-    build_rss(site, articles)
+    # Append voices to search index by rewriting the search page list
+    # (build_pages already wrote search; refresh with combined links)
+    combined_for_search = articles + [
+        {
+            **v,
+            "primary_category": "voices",
+        }
+        for v in voices
+    ]
+    links = "".join(
+        f'<li><a href="{a["url"]}">{html.escape(a["title"])}</a> '
+        f'<span class="story-meta">{a["date_str"]} · '
+        f'{html.escape(cat_name(site, a.get("primary_category") or "news"))}</span></li>'
+        for a in combined_for_search
+    )
+    search_inner = f"""
+<p>Use your browser find (Ctrl+F) on this list, or add a real search later (Pagefind, Algolia, etc.).</p>
+<ul class="cat-list" id="search-index">{links}</ul>
+<script>
+(function(){{
+  var q = new URLSearchParams(location.search).get('q') || '';
+  if (!q) return;
+  q = q.toLowerCase();
+  document.querySelectorAll('#search-index li').forEach(function(li){{
+    li.style.display = li.textContent.toLowerCase().indexOf(q) >= 0 ? '' : 'none';
+  }});
+}})();
+</script>
+"""
+    build_static_page(site, articles, "search", "Search", search_inner)
+
+    build_rss(site, articles, voices)
 
     # CNAME for GitHub Pages / custom domain
     (DIST / "CNAME").write_text(site.get("domain") or "fakeburgtelegram.com", encoding="utf-8")

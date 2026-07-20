@@ -48,7 +48,7 @@ jobs:
         run: |
           set -e
           # wipe previous generated page trees (keep source)
-          rm -rf about category classifieds contact letter-to-the-editor privacy-policy search \
+          rm -rf about category champaign-voices classifieds contact letter-to-the-editor privacy-policy search \
                  submit-an-obituary submit-anniversary submit-birth submit-engagement \
                  submit-guest-column submit-news-tip submit-scores submit-wedding weather \
                  2025 2026 2027 docs

@@ -1,6 +1,9 @@
 # Draft queue — 31 stories (not live) · retrofitted for Champaign County
 
-All drafts use real local geography (US-36/68, Monument Square, school mascots, real streets/businesses as scenery). See `references/CHAMPAIGN-COUNTY-LOCAL-BIBLE.md`.
+All drafts use real local geography (roads, Monument Square, school mascots, real streets/businesses as scenery).  
+
+**Primary generation brain:** `references/CHAMPAIGN-COUNTY-INSTRUCT.md`  
+**Quick business/street lookup:** `references/CHAMPAIGN-COUNTY-LOCAL-BIBLE.md`
 
 | # | Date | Headline | Town / anchors |
 |---|------|----------|----------------|

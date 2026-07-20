@@ -1,9 +1,14 @@
-# Champaign County, Ohio — local authenticity bible
+# Champaign County, Ohio — local authenticity bible (quick lookup)
 
-**Purpose:** Real place names, roads, schools, and businesses for Fake Burg Telegram satire.  
-**Rule:** Use these for *setting* (where someone parks, shops, drives). Do **not** invent scandals about real living private people. Invented characters + real geography = the Onion local formula.
+**For full LLM generation instructions + expanded research brain, use:**  
+→ **[`CHAMPAIGN-COUNTY-INSTRUCT.md`](./CHAMPAIGN-COUNTY-INSTRUCT.md)**  
 
-**Last researched:** July 2026 (public directories, village/city sites, visitor bureau, school sites). Businesses open/close — re-check before treating something as still open if it matters.
+That file merges Grok Heavy research (roads, townships, lore, surnames, Graham wrestling, etc.) with this business/street inventory. Prefer the instruct file when writing new stories.
+
+**Purpose of this page:** Short place/business cheat-sheet.  
+**Rule:** Use for *setting* (where someone parks, shops, drives). Do **not** invent scandals about real living private people. Invented characters + real geography = the Onion local formula.
+
+**Last researched:** July 2026 (public directories, village/city sites, visitor bureau, school sites + Grok Heavy county research). Businesses open/close — re-check before treating something as still open if it matters.
 
 **Caution:** There is a *Mechanicsburg, PA* and a *Lewisburg, OH* (Preble Co.). We mean **Mechanicsburg, Champaign Co.** and **North Lewisburg, Champaign Co.**
 
@@ -15,7 +20,7 @@
 |------|--------|
 | County seat | **Urbana** (city) |
 | Crossroads | **US-36** (east–west) and **US-68** (north–south) meet at downtown Urbana |
-| Other major routes | **SR-29**, **SR-54**, **SR-161**, **SR-245**, county roads / township roads |
+| Other major routes | **SR-29**, **SR-54**, **SR-161**, **SR-245**, **SR-559**, **SR-235**, county/township roads |
 | Phone area | Mostly **937** |
 | Fair | **Champaign County Fair**, fairgrounds **384 Park Ave, Urbana** |
 | Region vibe | Farmland, small villages, high-school sports as civic religion, Dayton/Springfield orbit |

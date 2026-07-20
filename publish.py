@@ -15,6 +15,7 @@ DIST = ROOT / "dist"
 GENERATED_DIRS = [
     "about",
     "category",
+    "champaign-voices",
     "classifieds",
     "contact",
     "letter-to-the-editor",

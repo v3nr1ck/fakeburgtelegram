@@ -34,8 +34,18 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parent
 ARTICLES = ROOT / "content" / "articles"
+VOICES = ROOT / "content" / "voices"
 IMG_DIR = ROOT / "assets" / "img"
+VOICES_IMG = IMG_DIR / "voices"
 ALLOWED_EXT = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+
+from voices_portraits import (  # noqa: E402
+    MIN_VOICE_PEOPLE,
+    VOICE_CAST,
+    VOICE_IDS,
+    normalize_portrait_id,
+    portrait_url,
+)
 
 CATEGORIES = [
     ("top-stories", "Top Stories (homepage hero)"),
@@ -258,6 +268,186 @@ def write_article(
     return new_path
 
 
+def _status_flags(meta: dict, today: str) -> tuple[bool, bool, bool]:
+    is_draft = truthy(meta.get("draft"))
+    pub = str(meta.get("publish_date") or meta.get("date") or "")[:10]
+    scheduled = (not is_draft) and pub > today
+    live = (not is_draft) and pub <= today and bool(pub)
+    return is_draft, scheduled, live
+
+
+def list_voices() -> list[dict]:
+    VOICES.mkdir(parents=True, exist_ok=True)
+    items = []
+    today = date.today().isoformat()
+    for path in VOICES.glob("*.md"):
+        if path.name.upper() in ("README.MD", "INDEX.MD", "SCHEDULING.MD"):
+            continue
+        meta, _body = parse_frontmatter(path.read_text(encoding="utf-8"))
+        people_raw = meta.get("people") or meta.get("voices") or []
+        people: list[dict] = []
+        if isinstance(people_raw, list):
+            for i, p in enumerate(people_raw):
+                if not isinstance(p, dict):
+                    continue
+                portrait = normalize_portrait_id(p.get("portrait"), fallback_index=i)
+                people.append(
+                    {
+                        "portrait": portrait,
+                        "portrait_file": portrait_url(portrait).split("/")[-1],
+                        "name": str(p.get("name") or "").strip(),
+                        "title": str(p.get("title") or "").strip(),
+                        "quote": str(p.get("quote") or "").strip(),
+                    }
+                )
+        # Always pad to 3 slots for the editor (required cast size)
+        while len(people) < MIN_VOICE_PEOPLE:
+            pid = VOICE_IDS[len(people) % len(VOICE_IDS)]
+            people.append(
+                {
+                    "portrait": pid,
+                    "portrait_file": portrait_url(pid).split("/")[-1],
+                    "name": "",
+                    "title": "",
+                    "quote": "",
+                }
+            )
+        people = people[:MIN_VOICE_PEOPLE]
+        byline = str(meta.get("date") or "")[:10]
+        pub = str(meta.get("publish_date") or meta.get("date") or "")[:10]
+        is_draft, scheduled, live = _status_flags(meta, today)
+        lede = str(meta.get("lede") or meta.get("prompt") or meta.get("excerpt") or "").strip()
+        items.append(
+            {
+                "filename": path.name,
+                "title": meta.get("title") or path.stem,
+                "slug": meta.get("slug") or path.stem,
+                "date": byline,
+                "publish_date": pub,
+                "lede": lede,
+                "people": people,
+                "draft": is_draft,
+                "scheduled": scheduled,
+                "live": live,
+                "meta": meta,
+                "quote_count": sum(1 for p in people if p.get("quote")),
+            }
+        )
+
+    def sort_key(a):
+        try:
+            return datetime.strptime(a["publish_date"] or a["date"], "%Y-%m-%d")
+        except Exception:
+            return datetime.min
+
+    items.sort(key=sort_key, reverse=True)
+    return items
+
+
+def load_voice(filename: str) -> dict | None:
+    safe = Path(filename).name
+    for v in list_voices():
+        if v["filename"] == safe:
+            return v
+    return None
+
+
+def dump_voices_markdown(meta: dict) -> str:
+    """Serialize voices frontmatter (needs nested people list)."""
+    if yaml:
+        dumped = yaml.safe_dump(
+            meta,
+            sort_keys=False,
+            allow_unicode=True,
+            default_flow_style=False,
+            width=1000,
+        )
+        return f"---\n{dumped}---\n"
+    # Minimal fallback without PyYAML
+    lines = ["---"]
+    for key in ("title", "slug", "date", "publish_date"):
+        if key in meta and meta[key] is not None:
+            val = str(meta[key]).replace('"', '\\"')
+            lines.append(f'{key}: "{val}"')
+    if meta.get("draft"):
+        lines.append("draft: true")
+    lede = str(meta.get("lede") or "").replace("\n", " ").strip()
+    if lede:
+        lines.append(f'lede: "{lede.replace(chr(34), chr(92)+chr(34))}"')
+    people = meta.get("people") or []
+    if people:
+        lines.append("people:")
+        for p in people:
+            pid = normalize_portrait_id(p.get("portrait"), 0)
+            lines.append(f"  - portrait: {pid}")
+            lines.append(f'    name: "{str(p.get("name") or "").replace(chr(34), "")}"')
+            lines.append(f'    title: "{str(p.get("title") or "").replace(chr(34), "")}"')
+            lines.append(f'    quote: "{str(p.get("quote") or "").replace(chr(34), "")}"')
+    lines.append("---")
+    return "\n".join(lines) + "\n"
+
+
+def write_voice(
+    *,
+    title: str,
+    slug: str,
+    date_str: str,
+    publish_date: str,
+    lede: str,
+    people: list[dict],
+    draft: bool = False,
+    old_filename: str | None = None,
+) -> Path:
+    VOICES.mkdir(parents=True, exist_ok=True)
+    slug = slugify(slug or title)
+    date_str = date_str or date.today().isoformat()
+    publish_date = (publish_date or date_str).strip()[:10]
+
+    clean_people = []
+    for i, p in enumerate(people):
+        quote = str(p.get("quote") or "").strip()
+        name = str(p.get("name") or "").strip()
+        job = str(p.get("title") or "").strip()
+        if not quote and not name and not job:
+            continue
+        portrait = normalize_portrait_id(p.get("portrait"), fallback_index=i)
+        clean_people.append(
+            {
+                "portrait": portrait,
+                "name": name or "Local Resident",
+                "title": job or "Concerned Citizen",
+                "quote": quote,
+            }
+        )
+
+    if len(clean_people) < MIN_VOICE_PEOPLE:
+        raise ValueError(
+            f"Champaign Voices needs at least {MIN_VOICE_PEOPLE} people with quotes "
+            f"(same stock faces, new names/jobs each time)."
+        )
+
+    meta: dict = {
+        "title": title.strip(),
+        "slug": slug,
+        "date": date_str,
+        "publish_date": publish_date,
+        "lede": lede.strip(),
+        "people": clean_people,
+    }
+    if draft:
+        meta["draft"] = True
+
+    new_name = f"{date_str}-{slug}.md"
+    new_path = VOICES / new_name
+    new_path.write_text(dump_voices_markdown(meta), encoding="utf-8")
+
+    if old_filename and old_filename != new_name:
+        old = VOICES / Path(old_filename).name
+        if old.is_file() and old.resolve() != new_path.resolve():
+            old.unlink()
+    return new_path
+
+
 def run_publish() -> str:
     from publish import publish
 
@@ -342,15 +532,38 @@ BASE = r"""
     .muted { color: var(--muted); font-size: 13px; }
     h1 { font-size: 1.4rem; margin: 0 0 0.25rem; }
     .sub { color: var(--muted); margin: 0 0 1.25rem; font-size: 14px; }
+    .voice-slot {
+      border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem 1rem 1rem;
+      margin-top: 0.85rem; background: #fafbfc;
+    }
+    .voice-slot h3 { margin: 0 0 0.5rem; font-size: 0.95rem; }
+    .portrait-pick { display: flex; flex-wrap: wrap; gap: 0.65rem; margin: 0.35rem 0 0.5rem; }
+    .portrait-pick label {
+      margin: 0; font-weight: 600; display: flex; flex-direction: column; align-items: center;
+      gap: 0.25rem; font-size: 11px; cursor: pointer;
+    }
+    .portrait-pick img {
+      width: 52px; height: 52px; border-radius: 50%; border: 2px solid #cbd5e0; object-fit: cover;
+      background: #ddd;
+    }
+    .portrait-pick input:checked + img { border-color: var(--brand); box-shadow: 0 0 0 2px rgba(51,114,165,0.35); }
+    .portrait-pick input { position: absolute; opacity: 0; pointer-events: none; }
+    .mini-portraits { display: flex; gap: 0.25rem; }
+    .mini-portraits img { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border); object-fit: cover; }
+    nav.app-nav a.active { color: #fff; text-decoration: underline; text-underline-offset: 4px; }
   </style>
 </head>
 <body>
   <header class="app">
     <div class="logo">Fake Burg<span>CMS · local only</span></div>
-    <nav>
-      <a href="{{ url_for('dashboard') }}">All articles</a>
+    <nav class="app-nav">
+      <a href="{{ url_for('dashboard') }}">Articles</a>
+      &nbsp;·&nbsp;
+      <a href="{{ url_for('voices_dashboard') }}">Champaign Voices</a>
       &nbsp;·&nbsp;
       <a href="{{ url_for('new_article') }}">New article</a>
+      &nbsp;·&nbsp;
+      <a href="{{ url_for('new_voice') }}">New Voices</a>
       &nbsp;·&nbsp;
       <a href="{{ url_for('publish_site') }}">Publish</a>
       &nbsp;·&nbsp;
@@ -374,9 +587,11 @@ DASHBOARD = """
 {% block title %}Articles{% endblock %}
 {% block body %}
   <h1>Articles</h1>
-  <p class="sub">{{ articles|length }} stories · set <strong>Publish date</strong> to schedule · CMS push keeps those dates.</p>
+  <p class="sub">{{ articles|length }} stories · set <strong>Publish date</strong> to schedule · CMS push keeps those dates.
+    For reaction packages, use <a href="{{ url_for('voices_dashboard') }}">Champaign Voices</a>.</p>
   <div class="toolbar">
     <a class="btn" href="{{ url_for('new_article') }}">+ New article</a>
+    <a class="btn ghost" href="{{ url_for('new_voice') }}">+ New Voices</a>
     <a class="btn ok" href="{{ url_for('publish_site') }}">Publish to site</a>
     <span class="muted">Purple = scheduled (not live yet). Orange = needs photo.</span>
   </div>
@@ -529,16 +744,168 @@ EDIT = """
 {% endblock %}
 """
 
+VOICES_DASHBOARD = """
+{% extends "base" %}
+{% block title %}Champaign Voices{% endblock %}
+{% block body %}
+  <h1>Champaign Voices</h1>
+  <p class="sub">{{ voices|length }} pieces · Onion-style “American Voices”: headline + lede + 3 locals
+    (same 5 faces, new names/jobs each time). Same <strong>Publish date</strong> scheduling as articles.</p>
+  <div class="toolbar">
+    <a class="btn" href="{{ url_for('new_voice') }}">+ New Voices piece</a>
+    <a class="btn ghost" href="{{ url_for('dashboard') }}">Articles</a>
+    <a class="btn ok" href="{{ url_for('publish_site') }}">Publish to site</a>
+  </div>
+  <div class="card">
+    <table>
+      <thead>
+        <tr><th>Faces</th><th>Piece</th><th>Go live</th><th>Quotes</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for v in voices %}
+        <tr>
+          <td>
+            <div class="mini-portraits">
+              {% for p in v.people if p.quote %}
+              <img src="{{ url_for('media', filename='voices/' ~ p.portrait_file) }}" alt="" title="{{ p.name }}">
+              {% endfor %}
+            </div>
+          </td>
+          <td>
+            <strong>{{ v.title }}</strong><br>
+            <span class="muted">{{ v.lede[:100] }}{% if v.lede|length > 100 %}…{% endif %}</span>
+            {% if v.draft %}<span class="badge draft">draft</span>
+            {% elif v.scheduled %}<span class="badge scheduled">scheduled</span>
+            {% elif v.live %}<span class="badge live">live</span>{% endif %}
+          </td>
+          <td><span class="muted">{{ v.publish_date }}</span></td>
+          <td><span class="muted">{{ v.quote_count }}/3</span></td>
+          <td style="white-space:nowrap">
+            <a class="btn ghost" href="{{ url_for('edit_voice', filename=v.filename) }}">Edit</a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="muted">No Champaign Voices yet. Create one.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+"""
+
+VOICES_EDIT = """
+{% extends "base" %}
+{% block title %}{{ 'Edit' if voice else 'New' }} Champaign Voices{% endblock %}
+{% block body %}
+  <h1>{{ 'Edit Champaign Voices' if voice else 'New Champaign Voices' }}</h1>
+  <p class="sub">Headline + short setup ending in <em>What do you think?</em> + three hilarious idiotic quotes.
+    Portraits 1–5 stay the same sitewide; change names and jobs every piece.</p>
+
+  <div class="card" style="padding:1rem 1.25rem 1.5rem">
+  <form class="edit" method="post"
+        action="{{ url_for('edit_voice', filename=voice.filename) if voice else url_for('new_voice') }}">
+    <label>Headline *</label>
+    <input type="text" name="title" required value="{{ voice.title if voice else '' }}"
+           placeholder="County Closes Crybaby Bridge Overnight for ‘Normal Asphalt Reasons’">
+
+    <div class="row">
+      <div>
+        <label>Byline date</label>
+        <input type="date" name="date" value="{{ voice.date if voice and voice.date else today }}">
+      </div>
+      <div>
+        <label>Publish date (go live)</label>
+        <input type="date" name="publish_date"
+               value="{{ voice.publish_date if voice and voice.publish_date else (voice.date if voice and voice.date else today) }}">
+        <p class="help">Same scheduling as articles (Eastern calendar day on the live site).</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>URL slug <span class="muted">(optional)</span></label>
+        <input type="text" name="slug" value="{{ voice.slug if voice else '' }}" placeholder="auto-from-headline">
+      </div>
+      <div>
+        <label style="margin-top:1.6rem">&nbsp;</label>
+        <div class="checks" style="margin-top:0.35rem">
+          <label>
+            <input type="checkbox" name="draft" value="1" {% if voice and voice.draft %}checked{% endif %}>
+            Draft (never auto-publish)
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <label>Lede / setup *</label>
+    <p class="help">1–2 sentences of “what happened,” ideally ending with <strong>What do you think?</strong></p>
+    <textarea class="body" name="lede" required style="min-height:110px"
+      placeholder="Champaign County engineers say the overnight closure is strictly for resurfacing… What do you think?">{{ voice.lede if voice else '' }}</textarea>
+
+    <p class="help" style="margin-top:1rem"><strong>Exactly 3 people required.</strong>
+      Pick any of the 9 stock faces (same photos every time; new name + job each piece).</p>
+
+    {% for i in range(3) %}
+    {% set defaults = [
+      {'portrait': 'young-white-man', 'name':'', 'title':'', 'quote':''},
+      {'portrait': 'young-white-woman', 'name':'', 'title':'', 'quote':''},
+      {'portrait': 'old-white-man', 'name':'', 'title':'', 'quote':''},
+    ] %}
+    {% set p = voice.people[i] if voice else defaults[i] %}
+    <div class="voice-slot">
+      <h3>Person {{ i + 1 }} *</h3>
+      <label>Stock portrait</label>
+      <div class="portrait-pick">
+        {% for face in cast %}
+        <label title="{{ face.label }}">
+          <input type="radio" name="portrait_{{ i }}" value="{{ face.id }}"
+            {% if p.portrait == face.id %}checked{% endif %}
+            {% if not p.portrait and loop.index0 == i %}checked{% endif %}>
+          <img src="{{ url_for('media', filename='voices/' ~ face.file) }}" alt="{{ face.label }}">
+          {{ face.label }}
+        </label>
+        {% endfor %}
+      </div>
+      <div class="row">
+        <div>
+          <label>Name</label>
+          <input type="text" name="name_{{ i }}" value="{{ p.name }}" placeholder="Dale Evilsizor" required>
+        </div>
+        <div>
+          <label>Job / title (make it weird)</label>
+          <input type="text" name="job_{{ i }}" value="{{ p.title }}" placeholder="Carafe Refiller" required>
+        </div>
+      </div>
+      <label>Quote</label>
+      <input type="text" name="quote_{{ i }}" value="{{ p.quote }}"
+             placeholder="I prefer the vomit test." required>
+    </div>
+    {% endfor %}
+
+    <div class="form-actions">
+      <button class="btn" type="submit" name="action" value="save">Save Voices</button>
+      <button class="btn ok" type="submit" name="action" value="save_publish">Save &amp; rebuild site</button>
+      <a class="btn ghost" href="{{ url_for('voices_dashboard') }}">Cancel</a>
+      {% if voice %}
+      <button class="btn danger" type="submit" name="action" value="delete"
+              onclick="return confirm('Delete this Champaign Voices piece permanently?')">Delete</button>
+      {% endif %}
+    </div>
+  </form>
+  </div>
+{% endblock %}
+"""
+
 PUBLISH_PAGE = """
 {% extends "base" %}
 {% block title %}Publish{% endblock %}
 {% block body %}
   <h1>Publish to live site</h1>
-  <p class="sub">Rebuild HTML from your articles, then push to GitHub so fakeburgtelegram.com updates (still free).</p>
+  <p class="sub">Rebuild HTML from your articles <strong>and Champaign Voices</strong>, then push to GitHub so fakeburgtelegram.com updates (still free).</p>
   <div class="card" style="padding:1.25rem">
     <form method="post">
       <ol>
-        <li><strong>Build</strong> — updates files on this PC</li>
+        <li><strong>Build</strong> — updates files on this PC (articles + voices)</li>
         <li><strong>Push</strong> — sends them to GitHub Pages (~1–2 min live)</li>
       </ol>
       <div class="form-actions">
@@ -558,6 +925,8 @@ TEMPLATES = {
     "base": BASE,
     "dashboard": DASHBOARD,
     "edit": EDIT,
+    "voices_dashboard": VOICES_DASHBOARD,
+    "voices_edit": VOICES_EDIT,
     "publish": PUBLISH_PAGE,
 }
 
@@ -583,6 +952,11 @@ def render(page: str, **ctx):
 @app.route("/")
 def dashboard():
     return render("dashboard", articles=list_articles())
+
+
+@app.route("/voices")
+def voices_dashboard():
+    return render("voices_dashboard", voices=list_voices())
 
 
 @app.route("/media/<path:filename>")
@@ -614,6 +988,98 @@ def edit_article(filename):
         flash("Article deleted. Publish to update the live site.", "ok")
         return redirect(url_for("dashboard"))
     return _save_from_form(old_filename=filename)
+
+
+@app.route("/voices/new", methods=["GET", "POST"])
+def new_voice():
+    if request.method == "GET":
+        return render(
+            "voices_edit",
+            voice=None,
+            cast=VOICE_CAST,
+            today=date.today().isoformat(),
+        )
+    return _save_voice_from_form(old_filename=None)
+
+
+@app.route("/voices/edit/<path:filename>", methods=["GET", "POST"])
+def edit_voice(filename):
+    voice = load_voice(filename)
+    if not voice:
+        flash("Champaign Voices piece not found.", "error")
+        return redirect(url_for("voices_dashboard"))
+    if request.method == "GET":
+        return render(
+            "voices_edit",
+            voice=voice,
+            cast=VOICE_CAST,
+            today=date.today().isoformat(),
+        )
+
+    action = request.form.get("action") or "save"
+    if action == "delete":
+        path = VOICES / Path(filename).name
+        if path.is_file():
+            path.unlink()
+        flash("Champaign Voices piece deleted. Publish to update the live site.", "ok")
+        return redirect(url_for("voices_dashboard"))
+    return _save_voice_from_form(old_filename=filename)
+
+
+def _save_voice_from_form(old_filename: str | None):
+    title = (request.form.get("title") or "").strip()
+    if not title:
+        flash("Headline is required.", "error")
+        return redirect(request.url)
+
+    slug = (request.form.get("slug") or "").strip() or slugify(title)
+    date_str = (request.form.get("date") or date.today().isoformat()).strip()[:10]
+    publish_date = (request.form.get("publish_date") or date_str).strip()[:10]
+    lede = (request.form.get("lede") or "").strip()
+    draft = request.form.get("draft") == "1"
+
+    if not lede:
+        flash("Lede / setup is required.", "error")
+        return redirect(request.url)
+
+    people = []
+    for i in range(MIN_VOICE_PEOPLE):
+        people.append(
+            {
+                "portrait": request.form.get(f"portrait_{i}") or VOICE_IDS[i % len(VOICE_IDS)],
+                "name": (request.form.get(f"name_{i}") or "").strip(),
+                "title": (request.form.get(f"job_{i}") or "").strip(),
+                "quote": (request.form.get(f"quote_{i}") or "").strip(),
+            }
+        )
+
+    try:
+        path = write_voice(
+            title=title,
+            slug=slug,
+            date_str=date_str,
+            publish_date=publish_date,
+            lede=lede,
+            people=people,
+            draft=draft,
+            old_filename=old_filename,
+        )
+    except ValueError as e:
+        flash(str(e), "error")
+        return redirect(request.url)
+
+    action = request.form.get("action") or "save"
+    if action == "save_publish":
+        try:
+            log = run_publish()
+            flash(f"Saved {path.name} and rebuilt the site locally.", "ok")
+            flash(log[:500] if log else "OK", "ok")
+        except Exception as e:
+            flash(f"Saved {path.name}, but rebuild failed: {e}", "error")
+    else:
+        flash(f"Saved {path.name}. Use Publish when you want the live site updated.", "ok")
+
+    return redirect(url_for("edit_voice", filename=path.name))
 
 
 def _save_from_form(old_filename: str | None):
@@ -723,8 +1189,11 @@ def publish_site():
 
 def main():
     ARTICLES.mkdir(parents=True, exist_ok=True)
+    VOICES.mkdir(parents=True, exist_ok=True)
     IMG_DIR.mkdir(parents=True, exist_ok=True)
+    VOICES_IMG.mkdir(parents=True, exist_ok=True)
     print("\n  Fake Burg CMS  →  http://127.0.0.1:5050\n  (local only — not on the public internet)\n")
+    print("  Articles · Champaign Voices · Publish\n")
     app.run(host="127.0.0.1", port=5050, debug=False)
 
 

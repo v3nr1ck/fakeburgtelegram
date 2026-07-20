@@ -31,6 +31,7 @@ nav:
   - label: Opinion
     children:
       - { label: Latest Opinion, href: /category/opinion/ }
+      - { label: Champaign Voices, href: /champaign-voices/ }
       - { label: Letter to the Editor, href: /letter-to-the-editor/ }
       - { label: Submit Guest Column, href: /submit-guest-column/ }
   - label: Life & Community
@@ -51,6 +52,7 @@ nav:
 
 home_sections:
   - { title: Top Stories, category: top-stories, layout: hero, limit: 5 }
+  - { title: Champaign Voices, layout: voices, limit: 3 }
   - { title: News, category: news, layout: featured-list, limit: 8 }
   - { title: Sports, category: sports, layout: featured-list, limit: 8 }
   - { title: Life & Culture, category: community, layout: featured-list, limit: 8 }
@@ -67,6 +69,7 @@ categories:
   special-sections: { name: Special Sections, description: Features and special coverage. }
   fair: { name: Fair, description: Champaign County Fair and related coverage. }
   obituaries: { name: Obituaries, description: Remembrances and notices. }
+  voices: { name: Champaign Voices, description: What regular people think about the news — allegedly. }
 
 weather:
   city: Mechanicsburg
