@@ -51,8 +51,10 @@ Body below `---` is optional (ignored for now).
 2. **Portrait IDs** are the fixed stock cast below — same photos every time; **new name + job every piece**.
 3. Jobs should be ridiculous and specific (`Carafe Refiller`, `Monologue Archivist` energy).
 4. Quotes are short (one line, sometimes two).
-5. Topic can be national-news-style *or* hyper-local Champaign County satire.
-6. Scheduling: same as articles (`draft`, `publish_date` / `date` vs America/New_York).
+5. **Topics should be big / national / world / existential news** — not stories *about* Champaign County.
+   The **voices** are local small-town minds reacting. The **headline** is broader current events.
+6. Batch generator for big runs: `python scripts/generate_voices_batch.py`
+7. Scheduling: same as articles (`draft`, `publish_date` / `date` vs America/New_York).
 
 ## Stock cast (`assets/img/voices/`)
 

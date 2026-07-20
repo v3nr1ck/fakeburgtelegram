@@ -738,26 +738,6 @@ img { max-width: 100%; height: auto; display: block; }
   font-weight: 700;
 }
 
-.voices-more-list {
-  list-style: none;
-  margin: 1.5rem 0 0;
-  padding: 1rem 0 0;
-  border-top: 1px solid var(--border);
-}
-
-.voices-more-list li {
-  margin: 0.45rem 0;
-  font-weight: 600;
-}
-
-.voices-date-inline {
-  display: inline-block;
-  margin-left: 0.5rem;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-muted);
-}
-
 /* Quote rows — circle left, text right (Onion layout) */
 .voices-people {
   display: flex;

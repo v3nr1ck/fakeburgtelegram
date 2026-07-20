@@ -893,20 +893,11 @@ def voices_home_section(title: str, items: list[dict]) -> str:
             f'<p class="empty-state">No Champaign Voices yet. Add files under content/voices/.</p>'
             f"</section>"
         )
-    # Homepage: latest piece in full Onion layout (not a cramped grid of three)
+    # Homepage: latest piece only (full Onion layout) + link to archive — no stacked list
     lead = voices_teaser_card(items[0], show_people=True)
-    more = ""
-    if len(items) > 1:
-        links = "".join(
-            f'<li><a href="{v["url"]}">{html.escape(v["title"])}</a>'
-            f'<span class="voices-date-inline">{html.escape(v["date_str"])}</span></li>'
-            for v in items[1:3]
-        )
-        more = f'<ul class="voices-more-list">{links}</ul>'
     return f"""
 <section class="section section-voices">
   {lead}
-  {more}
   <p class="voices-index-link"><a href="/champaign-voices/">More Champaign Voices →</a></p>
 </section>
 """
