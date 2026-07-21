@@ -1,4 +1,4 @@
-/* Fake Burg Telegram — local newspaper chrome inspired by classic Midwest dailies */
+/* Fake Burg Telegram — headline face matches live Champaign Voices (Georgia) */
 :root {
   --brand: #3372a5;
   --brand-light: #4db2ec;
@@ -10,8 +10,12 @@
   --bg-soft: #f7f7f7;
   --footer-bg: #1a1a1a;
   --max: 1140px;
+  /* Body / UI — same family stack as live site */
   --font: "Open Sans", "Roboto", "Segoe UI", Arial, sans-serif;
-  --font-display: "Roboto", "Open Sans", Arial, sans-serif;
+  /* Headlines — Georgia (what live uses on Champaign Voices titles) */
+  --font-display: Georgia, "Times New Roman", "Liberation Serif", Times, serif;
+  /* Section labels / nav / cats */
+  --font-condensed: "Montserrat", "Open Sans", Arial, sans-serif;
   --font-accent: "Montserrat", "Open Sans", Arial, sans-serif;
 }
 
@@ -27,7 +31,8 @@ body {
   color: var(--text);
   background: var(--bg);
   line-height: 1.55;
-  font-size: 15px;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
 }
 
 a { color: var(--brand); text-decoration: none; }
@@ -145,6 +150,7 @@ img { max-width: 100%; height: auto; display: block; }
 .nav-item > button {
   display: block;
   padding: 0.7rem 0.85rem;
+  font-family: inherit;
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
@@ -153,7 +159,6 @@ img { max-width: 100%; height: auto; display: block; }
   background: none;
   border: 0;
   cursor: pointer;
-  font-family: inherit;
 }
 
 .nav-item > a:hover,
@@ -259,7 +264,7 @@ img { max-width: 100%; height: auto; display: block; }
   margin: 0 0 1rem;
   padding-bottom: 0.45rem;
   border-bottom: 2px solid #111;
-  font-family: var(--font-display);
+  font-family: var(--font-accent);
   font-size: 1.05rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -276,6 +281,7 @@ img { max-width: 100%; height: auto; display: block; }
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 0.35rem;
+  font-family: var(--font);
 }
 
 .story-meta a { color: var(--text-muted); }
@@ -283,6 +289,7 @@ img { max-width: 100%; height: auto; display: block; }
 
 .story-cat {
   display: inline-block;
+  font-family: var(--font);
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
@@ -291,21 +298,48 @@ img { max-width: 100%; height: auto; display: block; }
   margin-bottom: 0.25rem;
 }
 
-.story-title {
-  margin: 0;
-  font-family: var(--font-display);
+/*
+ * ALL story/article/voices headlines share one face: Georgia
+ * (same as .voices-headline — the “Congress Debates…” treatment).
+ * Never use Roboto/Open Sans on titles.
+ */
+.story-title,
+.article-title,
+.voices-headline,
+.page-header h1,
+.voices-index-header h1 {
+  font-family: Georgia, "Times New Roman", "Liberation Serif", Times, serif !important;
   font-weight: 700;
-  line-height: 1.3;
+  font-style: normal;
+  letter-spacing: -0.01em;
   color: #111;
 }
 
-.story-title a { color: inherit; }
-.story-title a:hover { color: var(--brand); }
+.story-title {
+  margin: 0;
+  font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+  line-height: 1.15;
+}
+
+.story-title a,
+.voices-headline a {
+  color: inherit;
+  text-decoration: none;
+  font-family: inherit;
+  font-weight: inherit;
+}
+
+.story-title a:hover,
+.voices-headline a:hover {
+  color: var(--brand);
+}
 
 .story-excerpt {
   margin: 0.45rem 0 0;
   color: #444;
-  font-size: 14px;
+  font-size: 0.95rem;
+  font-family: var(--font);
+  line-height: 1.45;
 }
 
 /* Hero / top stories */
@@ -346,8 +380,15 @@ img { max-width: 100%; height: auto; display: block; }
   background: linear-gradient(transparent 20%, rgba(0,0,0,0.75));
 }
 
-.hero-feature .story-title { color: #fff; font-size: 1.45rem; }
-.hero-feature .story-title a { color: #fff; }
+.hero-feature .story-title {
+  color: #fff;
+  font-family: Georgia, "Times New Roman", "Liberation Serif", Times, serif !important;
+  font-size: clamp(1.4rem, 2.8vw, 1.95rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+}
+.hero-feature .story-title a { color: #fff; font-family: inherit; }
 .hero-feature .story-meta { color: rgba(255,255,255,0.85); }
 .hero-feature .story-cat { color: #9fd4f5; }
 
@@ -370,7 +411,12 @@ img { max-width: 100%; height: auto; display: block; }
   background: #ddd center/cover no-repeat;
 }
 
-.stack-item .story-title { font-size: 0.95rem; }
+.stack-item .story-title {
+  font-family: Georgia, "Times New Roman", "Liberation Serif", Times, serif !important;
+  font-size: 1.12rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
 
 /* Featured + list */
 .featured-list {
@@ -390,7 +436,12 @@ img { max-width: 100%; height: auto; display: block; }
   margin-bottom: 0.65rem;
 }
 
-.featured-card .story-title { font-size: 1.15rem; }
+.featured-card .story-title {
+  font-family: Georgia, "Times New Roman", "Liberation Serif", Times, serif !important;
+  font-size: clamp(1.3rem, 2.3vw, 1.65rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
 
 .list-col { display: flex; flex-direction: column; }
 
@@ -400,7 +451,11 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .list-item:last-child { border-bottom: 0; }
-.list-item .story-title { font-size: 0.95rem; font-weight: 600; }
+.list-item .story-title {
+  font-family: Georgia, "Times New Roman", "Liberation Serif", Times, serif !important;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
 
 /* Special sections grid */
 .grid-cards {
@@ -422,7 +477,11 @@ img { max-width: 100%; height: auto; display: block; }
   margin-bottom: 0.5rem;
 }
 
-.grid-card .story-title { font-size: 0.95rem; }
+.grid-card .story-title {
+  font-family: Georgia, "Times New Roman", "Liberation Serif", Times, serif !important;
+  font-size: 1.15rem;
+  font-weight: 700;
+}
 
 /* Category listing */
 .cat-list .cat-item {
@@ -443,7 +502,12 @@ img { max-width: 100%; height: auto; display: block; }
   background: #ddd center/cover no-repeat;
 }
 
-.cat-item .story-title { font-size: 1.2rem; }
+.cat-item .story-title {
+  font-family: Georgia, "Times New Roman", "Liberation Serif", Times, serif !important;
+  font-size: clamp(1.3rem, 2.5vw, 1.7rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
 
 .page-header {
   margin-bottom: 1.5rem;
@@ -453,14 +517,15 @@ img { max-width: 100%; height: auto; display: block; }
 
 .page-header h1 {
   margin: 0;
-  font-size: 1.6rem;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  font-size: clamp(1.75rem, 3vw, 2.35rem);
+  line-height: 1.12;
+  text-transform: none;
 }
 
 .page-header p {
   margin: 0.4rem 0 0;
   color: var(--text-muted);
+  font-family: var(--font);
 }
 
 .breadcrumb {
@@ -487,10 +552,10 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .article-title {
-  margin: 0 0 0.75rem;
-  font-size: clamp(1.6rem, 3vw, 2.15rem);
-  line-height: 1.2;
-  font-weight: 700;
+  margin: 0 0 0.85rem;
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  line-height: 1.12;
+  max-width: 40rem;
 }
 
 .article-byline {
@@ -534,6 +599,7 @@ img { max-width: 100%; height: auto; display: block; }
 .widget h3 {
   margin: 0 0 0.85rem;
   font-size: 0.95rem;
+  font-weight: 700;
   text-transform: uppercase;
   border-bottom: 2px solid #111;
   padding-bottom: 0.4rem;
@@ -604,7 +670,12 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .side-story:last-child { border-bottom: 0; }
-.side-story .story-title { font-size: 0.88rem; }
+.side-story .story-title {
+  font-family: Georgia, "Times New Roman", "Liberation Serif", Times, serif !important;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.18;
+}
 
 .parody-box {
   background: #fff8e6;
@@ -678,11 +749,12 @@ img { max-width: 100%; height: auto; display: block; }
 
 .voices-eyebrow {
   margin: 0 0 0.35rem;
+  font-family: var(--font);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #2f9e44; /* Onion-adjacent green kicker */
+  color: #2f9e44; /* Onion American Voices green kicker */
 }
 
 .voices-eyebrow a {
@@ -695,21 +767,8 @@ img { max-width: 100%; height: auto; display: block; }
 
 .voices-headline {
   margin: 0 0 0.65rem;
-  font-family: Georgia, "Times New Roman", "Liberation Serif", serif;
-  font-weight: 700;
   font-size: clamp(1.65rem, 3.2vw, 2.35rem);
   line-height: 1.15;
-  letter-spacing: -0.01em;
-  color: #111;
-}
-
-.voices-headline a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.voices-headline a:hover {
-  color: var(--brand);
 }
 
 .voices-date {
@@ -805,11 +864,12 @@ img { max-width: 100%; height: auto; display: block; }
   margin: 0 0 0.45rem;
   padding: 0;
   border: 0;
-  font-family: Georgia, "Times New Roman", "Liberation Serif", serif;
+  font-family: Georgia, "Times New Roman", "Liberation Serif", Times, serif !important;
   font-size: clamp(1.15rem, 2.2vw, 1.4rem);
   font-weight: 700;
   font-style: normal;
-  line-height: 1.35;
+  line-height: 1.28;
+  letter-spacing: -0.01em;
   color: #111;
   quotes: none;
 }
@@ -817,6 +877,7 @@ img { max-width: 100%; height: auto; display: block; }
 .voice-id {
   display: block;
   margin: 0;
+  font-family: var(--font);
   font-size: 0.9rem;
   line-height: 1.35;
   color: #5a5a5a;
@@ -843,7 +904,7 @@ img { max-width: 100%; height: auto; display: block; }
 }
 
 .voices-index-header h1 {
-  font-family: Georgia, "Times New Roman", serif;
+  /* family/weight from shared headline rule */
 }
 
 .voices-article .breadcrumb {
