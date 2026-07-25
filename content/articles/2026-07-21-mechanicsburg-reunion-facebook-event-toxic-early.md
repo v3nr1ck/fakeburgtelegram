@@ -1,13 +1,17 @@
 ---
-title: "Mechanicsburg reunion Facebook event toxic six months early"
-slug: "mechanicsburg-reunion-facebook-event-toxic-early"
-date: "2026-07-21"
-publish_date: "2026-07-21"
-category: "community, lifestyle"
-author: "Staff report"
-excerpt: "The class of whenever has already split into cliques again in the Burg chat."
+title: Mechanicsburg reunion Facebook event toxic six months early
+slug: mechanicsburg-reunion-facebook-event-toxic-early
+date: '2026-07-21'
+publish_date: '2026-07-21'
+category: community, lifestyle
+author: Staff report
+excerpt: The class of whenever has already split into cliques again in the Burg chat.
 top_story: false
 featured: true
+image: /assets/img/mechanicsburg-reunion-facebook-event-toxic-early-20260720-183906.jpg
+image_caption: ''
+image_seed: 1156965127741778
+image_size: 1344x768
 ---
 
 MECHANICSBURG — A Facebook event for a multi-year Indians alumni reunion has devolved into debates about open bar vs. cash bar, whether the DJ can play country, and who “actually peopled” in 11th grade on High Street.

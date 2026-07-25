@@ -1,13 +1,18 @@
 ---
-title: "Woman wins unofficial yard-sale championship with confidence pricing"
-slug: "woman-wins-yard-sale-championship-mechanicsburg"
-date: "2026-07-24"
-publish_date: "2026-07-24"
-category: "lifestyle, community"
-author: "Features desk"
-excerpt: "A cracked plant pot labeled “vintage vibes — $8” sold in four minutes off Main Street."
+title: Woman wins unofficial yard-sale championship with confidence pricing
+slug: woman-wins-yard-sale-championship-mechanicsburg
+date: '2026-07-24'
+publish_date: '2026-07-24'
+category: lifestyle, community
+author: Features desk
+excerpt: A cracked plant pot labeled “vintage vibes — $8” sold in four minutes off
+  Main Street.
 top_story: false
 featured: true
+image: /assets/img/woman-wins-yard-sale-championship-mechanicsburg-20260720-184023.jpg
+image_caption: ''
+image_seed: 5647575570908943
+image_size: 1344x768
 ---
 
 MECHANICSBURG — On a Saturday morning thick with early birds and early judgments, one homeowner moved a driveway full of objects of uncertain purpose by assigning them prices that dared you to negotiate — two blocks off Main Street, where serious people already had Hemisphere cups in hand.

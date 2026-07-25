@@ -1,13 +1,18 @@
 ---
-title: "Dad buys Indian Lake boat the family did not ask for, will use twice"
-slug: "dad-buys-indian-lake-boat-family-did-not-ask-for"
-date: "2026-07-20"
-publish_date: "2026-07-20"
-category: "lifestyle, community"
-author: "Features desk"
-excerpt: "The trailer is already a personality in a Mechanicsburg driveway."
+title: Dad buys Indian Lake boat the family did not ask for, will use twice
+slug: dad-buys-indian-lake-boat-family-did-not-ask-for
+date: '2026-07-20'
+publish_date: '2026-07-20'
+category: lifestyle, community
+author: Features desk
+excerpt: The trailer is already a personality in a Mechanicsburg driveway.
 top_story: false
 featured: true
+image: /assets/img/dad-buys-indian-lake-boat-family-did-not-ask-for-20260720-183326.jpg
+image_caption: Staff illustration — Dad buys Indian Lake boat the family did not ask
+  for, will use twice
+image_seed: 1515156643285331
+image_size: 1344x768
 ---
 
 MECHANICSBURG — A Burg father surprised his household with a used boat purchase he framed as “for the kids” and “for Indian Lake weekends,” while the kids primarily wanted Wi‑Fi and not to wake up at 6 a.m. to put on life jackets.

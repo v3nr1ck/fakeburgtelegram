@@ -1,13 +1,17 @@
 ---
-title: "Rec coach calls emergency meeting about snacks, not defense"
-slug: "rec-coach-emergency-meeting-about-snacks"
-date: "2026-07-23"
-publish_date: "2026-07-23"
-category: "sports, community"
-author: "Sports desk"
-excerpt: "The 2-3 zone can wait. The orange slices cannot. North Lewisburg edition."
+title: Rec coach calls emergency meeting about snacks, not defense
+slug: rec-coach-emergency-meeting-about-snacks
+date: '2026-07-23'
+publish_date: '2026-07-23'
+category: sports, community
+author: Sports desk
+excerpt: The 2-3 zone can wait. The orange slices cannot. North Lewisburg edition.
 top_story: false
 featured: true
+image: /assets/img/rec-coach-emergency-meeting-about-snacks-20260720-184004.jpg
+image_caption: ''
+image_seed: 4633319531372836
+image_size: 1344x768
 ---
 
 NORTH LEWISBURG — A youth soccer coach emailed parents an “urgent team meeting” that turned out to be entirely about who forgot snack duty and whether juice boxes count as hydration or chaos, in a chat full of Cardinals parents.

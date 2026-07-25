@@ -1,13 +1,17 @@
 ---
-title: "Man measures self-worth entirely in firewood stack neatness"
-slug: "man-measures-self-worth-in-firewood-stack-neatness"
-date: "2026-07-22"
-publish_date: "2026-07-22"
-category: "community, lifestyle"
-author: "Staff report"
-excerpt: "Crooked rows have been called “a cry for help” on a township road near Rosewood."
+title: Man measures self-worth entirely in firewood stack neatness
+slug: man-measures-self-worth-in-firewood-stack-neatness
+date: '2026-07-22'
+publish_date: '2026-07-22'
+category: community, lifestyle
+author: Staff report
+excerpt: Crooked rows have been called “a cry for help” on a township road near Rosewood.
 top_story: false
 featured: true
+image: /assets/img/man-measures-self-worth-in-firewood-stack-neatness-20260720-183925.jpg
+image_caption: ''
+image_seed: 5185037306798906
+image_size: 1344x768
 ---
 
 ROSEWOOD — As summer turns toward the idea of fall, a local man has begun the annual ritual of stacking firewood with the focus of a Swiss watchmaker and the judgment of a French waiter on a place outside Rosewood.

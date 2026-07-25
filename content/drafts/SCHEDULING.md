@@ -44,12 +44,37 @@ Shows “July 1, 2026” in the byline, but only appears on the site starting Ju
 draft: true
 ```
 
+## Top stories cadence (homepage hero)
+
+The homepage **Top Stories** hero only changes when a new article with `top_story: true` (or category `top-stories`) goes live.
+
+**Target:** about **one new top story per day** when you have content scheduled (not every 1–2 weeks).
+
+When bulk-scheduling:
+
+```yaml
+top_story: true
+featured: true
+category: news, top-stories   # or sports, community, etc. + top-stories
+```
+
+Or run after writing a batch:
+
+```powershell
+python scripts/ensure_top_story_cadence.py          # promote ~1/day on future dates
+python scripts/ensure_top_story_cadence.py --every 2  # every other day
+python scripts/ensure_top_story_cadence.py --dry-run
+```
+
+Daily GitHub Action still rebuilds once each morning; cadence is controlled by **which stories are flagged**, not by how often Actions runs.
+
 ## Bulk release plan
 
 1. Copy 20 files from `content/drafts/` → `content/articles/`.
 2. Set each file’s `date:` (or `publish_date:`) to consecutive days.
-3. `git push`.
-4. Done. One (or more) appear each day when the clock catches up.
+3. Mark top-story cadence (`top_story: true` on ~one story per day, or run `ensure_top_story_cadence.py`).
+4. `git push`.
+5. Done. One (or more) appear each day when the clock catches up.
 
 ## Local preview of future stories
 

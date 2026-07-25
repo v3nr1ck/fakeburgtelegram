@@ -1,10 +1,14 @@
 ---
-title: "Harold J. Example, 1941–2026"
+title: Harold J. Example, 1941–2026
 slug: harold-j-example
 date: 2026-06-15
 category: obituaries
 author: Family submitted
 excerpt: Sample obituary format for the site — replace with real paid notices as needed.
+image: /assets/img/harold-j-example-20260720-183827.jpg
+image_caption: ''
+image_seed: 7302020589396465
+image_size: 1344x768
 ---
 
 MECHANICSBURG — Harold J. Example, 84, of Mechanicsburg, passed away peacefully in this *sample obituary* used to demonstrate site layout.

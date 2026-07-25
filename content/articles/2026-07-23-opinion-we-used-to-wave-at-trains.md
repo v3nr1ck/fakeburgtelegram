@@ -1,13 +1,17 @@
 ---
-title: "OPINION: We used to wave at trains and that should count for something"
-slug: "opinion-we-used-to-wave-at-trains"
-date: "2026-07-23"
-publish_date: "2026-07-23"
-category: "opinion"
-author: "Editorial board"
-excerpt: "A defense of pointless friendliness as infrastructure in Champaign County."
+title: 'OPINION: We used to wave at trains and that should count for something'
+slug: opinion-we-used-to-wave-at-trains
+date: '2026-07-23'
+publish_date: '2026-07-23'
+category: opinion
+author: Editorial board
+excerpt: A defense of pointless friendliness as infrastructure in Champaign County.
 top_story: false
 featured: true
+image: /assets/img/opinion-we-used-to-wave-at-trains-20260720-183624.jpg
+image_caption: ''
+image_seed: 1183401874658526
+image_size: 1344x768
 ---
 
 There was a time in this county when a kid on a bike would throw a hand up at a locomotive engineer and the engineer would toot like the relationship meant something — same as waving at a tractor on US-36 or a combine off toward Cable.
